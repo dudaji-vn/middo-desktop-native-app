@@ -18,7 +18,7 @@ function createWindow() {
     pathname: path.join(__dirname, "./app/dist/index.html"),
     protocol: "file",
   });
-  mainWindow.loadURL("http://localhost:5173");
+  mainWindow.loadURL("http://localhost:3000");
 //   mainWindow.loadURL(startURL);
 }
 
