@@ -1,18 +1,27 @@
-const { app, BrowserWindow, ipcMain, Notification } = require("electron");
+const { app, BrowserWindow, ipcMain, Notification, screen } = require("electron");
+const electron = require("electron");
 const path = require("path");
 const url = require("url");
+const { setup: setupPushReceiver } = require('electron-push-receiver');
+
+// Call it before 'did-finish-load' with mainWindow a reference to your window
+const handleEvents = require("./handle-event");
 
 function createWindow() {
+  const screenSize = screen.getPrimaryDisplay().workAreaSize;
   const mainWindow = new BrowserWindow({
     title: "Middo",
-    width: 800,
-    height: 600,
+    // backgroundColor: '#2e2c29',
+    width: screenSize.width ,
+    height: screenSize.height,
+    // alwaysOnTop: true,
     webPreferences: {
         contextIsolation: true,
         nodeIntegration: true,
-        preload: path.join(__dirname, 'preload.js')
+        preload: path.join(__dirname, 'preload.js'),
     }
   });
+  setupPushReceiver(mainWindow.webContents);
   mainWindow.webContents.openDevTools();
   const startURL = url.format({
     pathname: path.join(__dirname, "./app/dist/index.html"),
@@ -25,11 +34,5 @@ function createWindow() {
 app.whenReady().then(()=>{
   createWindow();
 });
-
-ipcMain.on('send-message', (event, args) => {
-    console.log(args)
-    event.reply('reply-message', 'Hello from main process')
-})
-ipcMain.on('notify', (event, args) => {
-  new Notification({title: 'Notification', body: "Hiii"}).show()
-})
+app.setAsDefaultProtocolClient("middo")
+handleEvents();

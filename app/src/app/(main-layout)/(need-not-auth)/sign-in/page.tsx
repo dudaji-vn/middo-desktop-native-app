@@ -18,11 +18,22 @@ import { useAuthStore } from '@/stores/auth.store';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { useElectron } from '@/hooks/use-electron';
+import { ELECTRON_EVENTS } from '@/configs/electron-events';
 
-export default function SignIn() {
+interface SignInProps {
+  searchParams: {
+    type?: string;
+    token?: string;
+    refresh_token?: string;
+  };
+}
+export default function SignIn(props: SignInProps) {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const router = useRouter();
+  const {isElectron, ipcRenderer} = useElectron();
+  const { type, token, refresh_token } = props.searchParams;
   const {
     register,
     watch,
@@ -63,6 +74,25 @@ export default function SignIn() {
       // reset();
     }
   };
+
+  const handleLoginGoogle = async () => {
+    ipcRenderer.send(ELECTRON_EVENTS.GOOGLE_LOGIN);
+  }
+
+  useEffect(()=>{
+    if(type == "desktop") {
+      localStorage.setItem('type', type);
+      router.push('/api/auth/google');
+    } else {
+      localStorage.removeItem('type');
+    }
+  }, [router, type])
+
+  useEffect(() => {
+    if(token && refresh_token) {
+      window.location.href = `middo://token?token=${token}&refresh_token=${refresh_token}`
+    }
+  }, [token, refresh_token]);
 
   useEffect(() => {
     if (isAuthentication) {
@@ -124,9 +154,20 @@ export default function SignIn() {
           </div>
           <div className="flex items-center justify-center gap-5">
             <p>Or log in with</p>
-            <Link href="/api/auth/google">
+            {isElectron ? (
+              <MyButton.Icon color="default" onClick={handleLoginGoogle}>
+                <GoogleIcon />
+              </MyButton.Icon>
+            ) : (
+              <Link href="/api/auth/google">
               <MyButton.Icon color="default">
                 <GoogleIcon />
+              </MyButton.Icon>
+            </Link>
+            )}
+            <Link href="/a">
+              <MyButton.Icon color="default">
+                a
               </MyButton.Icon>
             </Link>
           </div>

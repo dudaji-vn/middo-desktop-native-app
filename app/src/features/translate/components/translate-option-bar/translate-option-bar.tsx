@@ -3,7 +3,6 @@
 import './style.css';
 
 import SpeechRecognition, {
-  useSpeechRecognition,
 } from 'react-speech-recognition';
 import { forwardRef, useEffect } from 'react';
 
@@ -18,6 +17,7 @@ import { useTranslateStore } from '@/stores/translate.store';
 import { useWindowSize } from 'usehooks-ts';
 import { useKeyboardShortcut } from '@/hooks/use-keyboard-shortcuts';
 import { SHORTCUTS } from '@/types/shortcuts';
+import useSpeechRecognizer from '@/hooks/use-speech-recognizer';
 
 export interface TranslateOptionBarProps
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -30,8 +30,7 @@ export const TranslateOptionBar = forwardRef<
 >(({ sourceLang, ...props }, ref) => {
   const { width } = useWindowSize();
   const isMobile = width < 768;
-  const { listening, interimTranscript, finalTranscript } =
-    useSpeechRecognition();
+  let { listening, interimTranscript, startSpeechToText, stopSpeechToText, finalTranscript } = useSpeechRecognizer(SUPPORTED_VOICE_MAP[sourceLang as keyof typeof SUPPORTED_VOICE_MAP]);
   const { setParam, removeParam } = useSetParams();
   const { setValue, isListening, setIsListening, isFocused } =
     useTranslateStore((state) => {
@@ -60,20 +59,21 @@ export const TranslateOptionBar = forwardRef<
 
     // request permission
     await navigator.mediaDevices.getUserMedia({ audio: true });
-    const isAllowed = SpeechRecognition.browserSupportsSpeechRecognition();
-    if (!isAllowed) {
-      toast.error('Your browser is not supported');
-      return;
-    }
+    // const isAllowed = SpeechRecognition.browserSupportsSpeechRecognition();
+    // if (!isAllowed) {
+    //   toast.error('Your browser is not supported');
+    //   return;
+    // }
     setValue('');
     removeParam('query');
     setIsListening(true);
-    SpeechRecognition.startListening({
-      language:
-        SUPPORTED_VOICE_MAP[sourceLang as keyof typeof SUPPORTED_VOICE_MAP],
-      continuous: !isMobile,
-      interimResults: true,
-    });
+    startSpeechToText();
+    // SpeechRecognition.startListening({
+    //   language:
+    //     SUPPORTED_VOICE_MAP[sourceLang as keyof typeof SUPPORTED_VOICE_MAP],
+    //   continuous: !isMobile,
+    //   interimResults: true,
+    // });
   };
   const handleStopListening = () => {
     setIsListening(false);
@@ -81,9 +81,9 @@ export const TranslateOptionBar = forwardRef<
       setParam('query', interimTranscript);
       setValue(interimTranscript);
     }
-    setTimeout(() => {
-      SpeechRecognition.stopListening();
-    }, 500);
+    try {
+      stopSpeechToText();
+    } catch {}
   };
   useKeyboardShortcut([SHORTCUTS.TOGGLE_SPEECH_TO_TEXT], () =>
     isListening ? handleStopListening() : handleStartListening(),

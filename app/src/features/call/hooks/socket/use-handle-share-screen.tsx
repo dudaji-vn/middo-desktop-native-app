@@ -10,13 +10,15 @@ import { createPeer } from "../../utils/peer-action.util";
 import ParticipantInVideoCall from "../../interfaces/participant";
 import { MonitorX } from "lucide-react";
 import { VIDEOCALL_LAYOUTS } from "../../constant/layout";
+import { useElectron } from "@/hooks/use-electron";
+import { ELECTRON_EVENTS } from "@/configs/electron-events";
 
 export default function useHandleShareScreen() {
     const { room, setLayout, setChooseScreen } = useVideoCallStore();
     const { participants, removeParticipantShareScreen, peerShareScreen, clearPeerShareScreen, addParticipant, addPeerShareScreen } = useParticipantVideoCallStore();
     const { shareScreenStream, setShareScreen, isShareScreen, setShareScreenStream } = useMyVideoCallStore();
     const { user } = useAuthStore();
-
+    const {isElectron, ipcRenderer} = useElectron();
     const removeShareScreen = useCallback((socketId: string) => {
         const item = participants.find((p: ParticipantInVideoCall) => p.socketId === socketId && p.isShareScreen);
         if (item) {
@@ -120,9 +122,9 @@ export default function useHandleShareScreen() {
             return;
         }
         try {
-            const isElectron = navigator.userAgent.toLowerCase().indexOf(' electron/') > -1;
             if(isElectron) {
                 setChooseScreen(true);
+                ipcRenderer.send(ELECTRON_EVENTS.GET_SCREEN_SOURCE);
                 return;
             }
 
@@ -145,7 +147,7 @@ export default function useHandleShareScreen() {
             }
         }
 
-    }, [addParticipant, isShareScreen, room?._id, setChooseScreen, setShareScreen, setShareScreenStream, stopShareScreen, user])
+    }, [addParticipant, ipcRenderer, isElectron, isShareScreen, room?._id, setChooseScreen, setShareScreen, setShareScreenStream, stopShareScreen, user])
 
     useEffect(() => {
         if(!shareScreenStream) return;
