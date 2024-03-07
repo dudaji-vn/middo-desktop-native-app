@@ -11,7 +11,7 @@ import Link from 'next/link';
 import { Button as MyButton } from '@/components/actions/button';
 import { PageLoading } from '@/components/loading/page-loading';
 import { ROUTE_NAMES } from '@/configs/route-name';
-import { loginService } from '@/services/auth.service';
+import { getCookieService, loginService, saveCookieService } from '@/services/auth.service';
 import { LoginSchema as schema } from '@/configs/yup-form';
 import toast from 'react-hot-toast';
 import { useAuthStore } from '@/stores/auth.store';
@@ -20,7 +20,10 @@ import { useRouter } from 'next/navigation';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useElectron } from '@/hooks/use-electron';
 import { ELECTRON_EVENTS } from '@/configs/electron-events';
-
+interface DataResponseToken {
+  token: string;
+  refresh_token: string;
+}
 interface SignInProps {
   searchParams: {
     type?: string;
@@ -80,13 +83,13 @@ export default function SignIn(props: SignInProps) {
   }
 
   useEffect(()=>{
-    if(type == "desktop") {
+    if(type == "desktop" && !isAuthentication) {
       localStorage.setItem('type', type);
       router.push('/api/auth/google');
     } else {
       localStorage.removeItem('type');
     }
-  }, [router, type])
+  }, [isAuthentication, router, type])
 
   useEffect(() => {
     if(token && refresh_token) {
@@ -95,14 +98,37 @@ export default function SignIn(props: SignInProps) {
   }, [token, refresh_token]);
 
   useEffect(() => {
+    if (isElectron && ipcRenderer) {
+      ipcRenderer.on(ELECTRON_EVENTS.GOOGLE_LOGIN_SUCCESS, (data: DataResponseToken)=>{
+        const { token, refresh_token } = data
+        saveCookieService({token, refresh_token})
+        .then(_=> {
+          window.location.reload();
+        })
+        .catch(err=>console.log(err))
+      })
+    }
+  }, [ipcRenderer, isElectron]);
+
+  useEffect(() => {
     if (isAuthentication) {
       if (!userData?.avatar && !userData?.name && !userData?.language) {
         router.push(ROUTE_NAMES.CREATE_ACCOUNT);
-      } else {
+      } else if(isElectron){
         router.push(ROUTE_NAMES.ROOT);
+      } else {
+        getCookieService()
+        .then(res=> {
+          const {data} = res;
+          const { accessToken , refreshToken} = data;
+          if(accessToken && refreshToken) {
+            window.location.href = `middo://token?token=${accessToken}&refresh_token=${refreshToken}`
+          }
+        })
+        .catch(err=>console.log(err))
       }
     }
-  }, [isAuthentication, router, userData]);
+  }, [isAuthentication, isElectron, refresh_token, router, token, userData?.avatar, userData?.language, userData?.name]);
 
   if (isAuthentication && userData) return null;
 
@@ -165,11 +191,6 @@ export default function SignIn(props: SignInProps) {
               </MyButton.Icon>
             </Link>
             )}
-            <Link href="/a">
-              <MyButton.Icon color="default">
-                a
-              </MyButton.Icon>
-            </Link>
           </div>
         </div>
       </div>

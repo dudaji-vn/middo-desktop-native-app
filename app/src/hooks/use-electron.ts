@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 export const useElectron = () => {
-	const [isElectron, setIsElectron] = useState(true);
+	const [isElectron, setIsElectron] = useState(false);
     let ipcRenderer = null;
     let electron = null;
     if (typeof window !== "undefined") {

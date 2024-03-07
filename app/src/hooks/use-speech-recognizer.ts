@@ -3,24 +3,33 @@ import useSpeechToText from 'react-hook-speech-to-text';
 export default function useSpeechRecognizer(
     language?: string
 ) {
-    let { error, isRecording, interimResult, results, startSpeechToText, stopSpeechToText } = useSpeechToText({
+    let { error, isRecording, interimResult, results, setResults, startSpeechToText, stopSpeechToText } = useSpeechToText({
         continuous: true,
         crossBrowser: true,
+        useLegacyResults: false,
         // timeout: 200,
         googleApiKey: NEXT_PUBLIC_GOOGLE_SPEECH_TO_TEXT_API_KEY,
         googleCloudRecognitionConfig: {
             languageCode: language || 'en-US'
         },
-        useOnlyGoogleCloud: true
+        useOnlyGoogleCloud: true,
     });
+    let finalTranscript = results.map((result) => {
+        if (typeof result === 'string') return result;
+        return result.transcript;
+    }).join(' ');
 
-    const finalTranscript = results.join(' ');
     let interimTranscript = interimResult;
     if(!interimTranscript && results.length > 0) {
-        interimTranscript = results.join(' ');
+        interimTranscript = finalTranscript
+    }
+
+    const resetTranscript = () => {
+        setResults([])
     }
     return {
-        error, listening: isRecording, interimTranscript, finalTranscript, startSpeechToText, stopSpeechToText
+        error, listening: isRecording, interimTranscript, finalTranscript, startSpeechToText, stopSpeechToText,resetTranscript,
+        setResults
     };
 }
 

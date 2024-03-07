@@ -8,6 +8,12 @@ module.exports = {
   packagerConfig: {
     asar: true,
     appBundleId: fromBuildIdentifier({ beta: 'middo', prod: 'middo' }),
+    protocols: [
+      {
+        "name": "Middo",
+        "schemes": ["middo"]
+      }
+    ]
     // osxSign: {},
     // osxNotarize: {
     //   tool: 'notarytool',
@@ -20,7 +26,38 @@ module.exports = {
   makers: [
     {
       name: '@electron-forge/maker-dmg',
+      config: {
+        name: 'Middo',
+        background: 'src/assets/background.png',
+        icon: 'src/assets/icon.icns',
+        overwrite: true,
+        contents: [
+          {
+            x: 110,
+            y: 150,
+          },
+          {
+            x: 240,
+            y: 150,
+            type: 'link',
+            path: '/Applications',
+          },
+        ],
+      },
     },
+    {
+      name: "@electron-forge/maker-deb",
+      config: {
+        "mimeType": ["x-scheme-handler/middo"],
+        "desktop": {
+          "Name": "Middo",
+          "Type": "Application",
+          "Icon": "src/assets/icon.png",
+          "Terminal": "false",
+          "MimeType": "x-scheme-handler/middo"
+        }
+      }
+    }
   ],
   plugins: [
     {

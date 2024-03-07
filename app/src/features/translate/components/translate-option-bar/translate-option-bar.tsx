@@ -2,8 +2,6 @@
 
 import './style.css';
 
-import SpeechRecognition, {
-} from 'react-speech-recognition';
 import { forwardRef, useEffect } from 'react';
 
 import { Button } from '@/components/actions';
@@ -30,7 +28,7 @@ export const TranslateOptionBar = forwardRef<
 >(({ sourceLang, ...props }, ref) => {
   const { width } = useWindowSize();
   const isMobile = width < 768;
-  let { listening, interimTranscript, startSpeechToText, stopSpeechToText, finalTranscript } = useSpeechRecognizer(SUPPORTED_VOICE_MAP[sourceLang as keyof typeof SUPPORTED_VOICE_MAP]);
+  let { listening, interimTranscript, startSpeechToText, stopSpeechToText, finalTranscript, resetTranscript } = useSpeechRecognizer(SUPPORTED_VOICE_MAP[sourceLang as keyof typeof SUPPORTED_VOICE_MAP]);
   const { setParam, removeParam } = useSetParams();
   const { setValue, isListening, setIsListening, isFocused } =
     useTranslateStore((state) => {
@@ -59,21 +57,10 @@ export const TranslateOptionBar = forwardRef<
 
     // request permission
     await navigator.mediaDevices.getUserMedia({ audio: true });
-    // const isAllowed = SpeechRecognition.browserSupportsSpeechRecognition();
-    // if (!isAllowed) {
-    //   toast.error('Your browser is not supported');
-    //   return;
-    // }
     setValue('');
     removeParam('query');
     setIsListening(true);
     startSpeechToText();
-    // SpeechRecognition.startListening({
-    //   language:
-    //     SUPPORTED_VOICE_MAP[sourceLang as keyof typeof SUPPORTED_VOICE_MAP],
-    //   continuous: !isMobile,
-    //   interimResults: true,
-    // });
   };
   const handleStopListening = () => {
     setIsListening(false);
@@ -83,6 +70,7 @@ export const TranslateOptionBar = forwardRef<
     }
     try {
       stopSpeechToText();
+      resetTranscript();
     } catch {}
   };
   useKeyboardShortcut([SHORTCUTS.TOGGLE_SPEECH_TO_TEXT], () =>

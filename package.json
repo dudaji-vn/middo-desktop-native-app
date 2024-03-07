@@ -1,5 +1,5 @@
 {
-  "name": "middo-desktop-native",
+  "name": "Middo",
   "version": "0.0.1",
   "description": "Middo",
   "main": "main.js",
@@ -10,15 +10,6 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "dist": "electron-builder"
-  },
-  "build": {
-    "appId": "middo",
-    "mac": {
-      "category": "your.app.category.type",
-      "target": [
-        "dmg"
-      ]
-    }
   },
   "keywords": [
     "electron",
