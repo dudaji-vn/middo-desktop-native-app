@@ -25,7 +25,7 @@
 // })
 
 // // Start service
-// const senderId = 'AIzaSyCUn5KV-z1PTBMxwyVbtZLTRr4G9GdrMHs'
+// const senderId = ''
 // console.log('starting service and registering a client')
 // ipcRenderer.send(START_NOTIFICATION_SERVICE, senderId)
 
