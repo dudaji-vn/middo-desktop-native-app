@@ -38,7 +38,7 @@ export default function useHandleShareScreen() {
             if (!socket.id) return;
             const peer = createPeer();
             peer.on("signal", (signal) => {
-                socket.emit(SOCKET_CONFIG.EVENTS.CALL.SEND_SIGNAL, { id: u.id, user, callerId: socket.id, signal, isShareScreen: true })
+                socket.emit(SOCKET_CONFIG.EVENTS.CALL.SEND_SIGNAL, { id: u.id, user, callerId: socket.id, signal, isShareScreen: true, isElectron: true })
             });
             peer.addStream(shareScreenStream);
             addPeerShareScreen({
@@ -108,7 +108,8 @@ export default function useHandleShareScreen() {
             peer.peer.destroy();
         });
         clearPeerShareScreen();
-    },[clearPeerShareScreen, peerShareScreen, removeParticipantShareScreen, setShareScreen, shareScreenStream])
+        ipcRenderer.send(ELECTRON_EVENTS.STOP_SHARE_SCREEN);
+    },[clearPeerShareScreen, ipcRenderer, peerShareScreen, removeParticipantShareScreen, setShareScreen, shareScreenStream])
 
     const handleShareScreen = useCallback(async ()=>{
         // if (participants.some((participant) => participant.isShareScreen)) return;

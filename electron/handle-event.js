@@ -2,13 +2,17 @@ const {
   ipcMain,
   Notification,
   shell,
+  screen,
   systemPreferences,
   desktopCapturer,
+  BrowserWindow,
 } = require("electron");
 const { EVENTS } = require("./events");
 const { APP_URL } = require("./config");
+const path = require("path");
 
-function handleEvents() {
+function handleEvents(mainWindow) {
+  let canvasWindow;
   ipcMain.on("send-message", (event, args) => {
     console.log(args);
     event.reply("reply-message", "Hello from main process");
@@ -43,6 +47,47 @@ function handleEvents() {
     });
     e.sender.send(EVENTS.GET_SCREEN_SOURCE, sources);
   });
+
+  ipcMain.on(EVENTS.STOP_SHARE_SCREEN, () => {
+    canvasWindow.hide();
+  });
+
+  ipcMain.on(EVENTS.SHARE_SCREEN_SUCCESS, () => {
+    canvasWindow = new BrowserWindow({
+      transparent: true,
+      frame: true,
+      alwaysOnTop: true,
+      modal: true,
+      show: false,
+      fullscreenable: true,
+      roundedCorners: false,
+      fullscreen: true,
+      simpleFullscreen: true,
+      webPreferences: {
+        hardwareAcceleration: true,
+        contextIsolation: true,
+        nodeIntegration: true,
+        preload: path.join(__dirname, "preload.js"),
+      }
+    });
+    // Show dev tool
+    // canvasWindow.webContents.openDevTools()
+    // canvasWindow.setParentWindow(mainWindow)
+    // canvasWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
+    canvasWindow.setIgnoreMouseEvents(true, { forward: true })
+    canvasWindow.loadFile('canvas.html')
+    canvasWindow.setPosition(0, 0); 
+    canvasWindow.maximize()
+    canvasWindow.show()
+    canvasWindow.on('enter-full-screen', () => {
+      screen.showHideMenuBar(false);
+    });
+
+  });
+
+  ipcMain.on(EVENTS.SEND_DOODLE_SHARE_SCREEN, (e, args) => {
+    canvasWindow.webContents.send(EVENTS.SEND_DOODLE_SHARE_SCREEN, args);
+  })
 }
 
 module.exports = handleEvents;

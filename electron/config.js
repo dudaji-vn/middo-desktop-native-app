@@ -1,4 +1,4 @@
-const APP_URL = 'http://localhost:3000';
+const APP_URL = 'http://localhost:3001';
 const APPLE_ID = 'apple_id';
 const APPLE_PASSWORD = 'apple_password';
 const APPLE_TEAM_ID = 'apple_team_id';

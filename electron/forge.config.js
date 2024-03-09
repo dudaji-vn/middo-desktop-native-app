@@ -2,12 +2,13 @@ const { FusesPlugin } = require('@electron-forge/plugin-fuses');
 const { FuseV1Options, FuseVersion } = require('@electron/fuses');
 const { utils: { fromBuildIdentifier } } = require('@electron-forge/core');
 const { APPLE_ID, APPLE_PASSWORD, APPLE_TEAM_ID } = require('./config');
-
+const path = require("path");
 module.exports = {
   buildIdentifier: 'prod',
   packagerConfig: {
+    icon: path.join(process.cwd(), "build", "icon.icns"),
     asar: true,
-    appBundleId: fromBuildIdentifier({ beta: 'middo', prod: 'middo' }),
+    // appBundleId: fromBuildIdentifier({ beta: 'middo', prod: 'middo' }),
     protocols: [
       {
         "name": "Middo",
@@ -28,36 +29,11 @@ module.exports = {
       name: '@electron-forge/maker-dmg',
       config: {
         name: 'Middo',
-        background: 'src/assets/background.png',
-        icon: 'src/assets/icon.icns',
+        icon: path.join(process.cwd(), "build", "icon.icns"),
         overwrite: true,
-        contents: [
-          {
-            x: 110,
-            y: 150,
-          },
-          {
-            x: 240,
-            y: 150,
-            type: 'link',
-            path: '/Applications',
-          },
-        ],
+        format: 'ULFO',
       },
     },
-    {
-      name: "@electron-forge/maker-deb",
-      config: {
-        "mimeType": ["x-scheme-handler/middo"],
-        "desktop": {
-          "Name": "Middo",
-          "Type": "Application",
-          "Icon": "src/assets/icon.png",
-          "Terminal": "false",
-          "MimeType": "x-scheme-handler/middo"
-        }
-      }
-    }
   ],
   plugins: [
     {

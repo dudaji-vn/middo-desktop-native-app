@@ -11,6 +11,7 @@ const { setup: setupPushReceiver } = require("electron-push-receiver");
 const url = require('url');
 const handleEvents = require("./handle-event");
 const { EVENTS } = require("./events");
+const { APP_URL } = require("./config");
 let mainWindow;
 // Set deep links
 if (process.defaultApp) {
@@ -39,6 +40,11 @@ if (!gotTheLock) {
   // Create mainWindow, load the rest of the app, etc...
   app.whenReady().then(() => {
     createWindow();
+    app.on('activate', () => {
+      if (BrowserWindow.getAllWindows().length === 0) {
+        createWindow()
+      }
+    })
   });
 
   app.on("open-url", (event, url) => {
@@ -57,6 +63,7 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     title: "Middo",
     // backgroundColor: '#2e2c29',
+    icon: path.join(__dirname, "build", "icon.ico"),
     width: screenSize.width,
     height: screenSize.height,
     // alwaysOnTop: true,
@@ -66,12 +73,12 @@ function createWindow() {
       preload: path.join(__dirname, "preload.js"),
     },
   });
-  mainWindow.loadURL("http://localhost:3000");
-  mainWindow.webContents.openDevTools();
+  mainWindow.loadURL(APP_URL);
+  // mainWindow.webContents.openDevTools();
   setupPushReceiver(mainWindow.webContents);
 }
 
-handleEvents();
+handleEvents(mainWindow);
 app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') app.quit()
 })

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Middo Doodle</title>
+    <style>
+      *, *::before, *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        position: relative;
+      }
+      body::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: 5px solid rgb(22, 250, 79);
+      }
+      .image-list {
+        height: 100vh;
+        width: 100%;
+        position: relative;
+      }
+      .image-list img {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="image-list"></div>
+    <script>
+      const images = [];
+      if (ipcRenderer) {
+        ipcRenderer.on("SEND_DOODLE_SHARE_SCREEN", (data) => {
+          const { image, user } = data;
+          const userId = user._id;
+          const index = images.findIndex((img) => img.userId === userId);
+          if (index !== -1) {
+            images[index].image = image;
+          } else {
+            images.push({ userId, image });
+          }
+          updateImageList();
+        });
+      }
+
+      function updateImageList() {
+        const imageList = document.querySelector(".image-list");
+        imageList.innerHTML = "";
+        images.forEach((image) => {
+          const img = document.createElement("img");
+          img.src = image.image;
+          img.alt = image.userId;
+          imageList.appendChild(img);
+        });
+      }
+    </script>
+  </body>
+</html>
