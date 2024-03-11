@@ -7,4 +7,4 @@ export const ROOM_SETTING = 'ROOM_SETTING';
 export const ACCESS_TOKEN_NAME = 'access_token';
 export const REFRESH_TOKEN_NAME = 'refresh_token';
 
-export const LOGIN_FROM_DESKTOP = 'login-from-desktop';
+export const LOGIN_FROM_DESKTOP = 'login_from_desktop';
