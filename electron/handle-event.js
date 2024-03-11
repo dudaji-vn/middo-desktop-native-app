@@ -13,17 +13,9 @@ const path = require("path");
 
 function handleEvents(mainWindow) {
   let canvasWindow;
-  ipcMain.on("send-message", (event, args) => {
-    console.log(args);
-    event.reply("reply-message", "Hello from main process");
-  });
-
-  ipcMain.on("notify", (event, args) => {
-    new Notification({ title: "Notification", body: "Hiii" }).show();
-  });
 
   ipcMain.on(EVENTS.GOOGLE_LOGIN, (event, args) => {
-    shell.openExternal(APP_URL + "/sign-in?type=desktop");
+    shell.openExternal(APP_URL + "/login-google-electron");
   });
 
   ipcMain.on(EVENTS.GET_SCREEN_SOURCE, async (e) => {
