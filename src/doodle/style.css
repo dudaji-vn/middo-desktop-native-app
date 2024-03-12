@@ -1,0 +1,91 @@
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  position: relative;
+}
+body::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 5px solid rgb(22, 250, 79);
+}
+.image-list {
+  height: 100vh;
+  width: 100%;
+  position: relative;
+}
+.image-list img {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.dragable {
+  position: absolute;
+  z-index: 9;
+  text-align: center;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  height: fit-content;
+  padding: 16px;
+  border-radius: 10px;
+  border: 1px solid #3d87ed88;
+  background-color: #fff;
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+}
+.btn {
+  padding: 10px;
+  color: #fff;
+  width: 40px;
+  height: 40px;
+  background-color: #e8e8e8;
+  border-radius: 100%;
+  border: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+.btn.active {
+  background-color: #3d87ed;
+}
+
+.btn .on {
+  display: none;
+}
+.btn .off {
+  display: block;
+}
+
+.btn.active .on {
+  display: block;
+}
+.btn.active .off {
+  display: none;
+}
+
+canvas#draw {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 8;
+  display: none;
+  cursor: url("./images/circle.png") 5 5, auto;
+}
