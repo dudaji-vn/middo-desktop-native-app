@@ -2,10 +2,11 @@ const {
   app,
   BrowserWindow,
   ipcMain,
-  Notification,
-  dialog,
+  shell,
+  systemPreferences,
   screen,
 } = require("electron");
+require('dotenv').config()
 const path = require("path");
 const { setup: setupPushReceiver } = require("electron-push-receiver");
 const url = require('url');
@@ -13,6 +14,7 @@ const handleEvents = require("./handle-event");
 const { EVENTS } = require("./events");
 const { APP_URL } = require("./config");
 let mainWindow;
+
 // Set deep links
 if (process.defaultApp) {
   if (process.argv.length >= 2) {
@@ -40,6 +42,8 @@ if (!gotTheLock) {
   // Create mainWindow, load the rest of the app, etc...
   app.whenReady().then(() => {
     createWindow();
+    app.setAppUserModelId("middo")
+    checkPermission();
     app.on('activate', () => {
       if (BrowserWindow.getAllWindows().length === 0) {
         createWindow()
@@ -78,6 +82,7 @@ function createWindow() {
   mainWindow.loadURL(APP_URL);
   // mainWindow.webContents.openDevTools();
   setupPushReceiver(mainWindow.webContents);
+  // checkPermission();
 }
 
 handleEvents(mainWindow);
@@ -85,24 +90,11 @@ app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') app.quit()
 })
 
-
-// Handle window controls via IPC
-ipcMain.on('shell:open', () => {
-  mainWindow.show();
-  mainWindow.focus();
-  // const pageDirectory = __dirname.replace('app.asar', 'app.asar.unpacked')
-  // const pagePath = path.join('file://', pageDirectory, 'index.html')
-  // shell.openExternal(pagePath)
-})
-
 ipcMain.on('set-ignore-mouse-events', (event, ignore, options) => {
   const win = BrowserWindow.fromWebContents(event.sender)
   win.setIgnoreMouseEvents(ignore, options)
 })
 
-ipcMain.on(EVENTS.TOGGLE_DRAW, () => {
-  // canvasWindow?.webContents.send(EVENTS.TOGGLE_DRAW);
-});
 ipcMain.on(EVENTS.TOGGLE_MIC, () => {
   mainWindow.webContents.send(EVENTS.TOGGLE_MIC);
 });
@@ -112,3 +104,18 @@ ipcMain.on(EVENTS.TOGGLE_CAMERA, () => {
 ipcMain.on(EVENTS.STOP_SHARE, () => {
   mainWindow.webContents.send(EVENTS.STOP_SHARE);
 });
+
+// Check and get permission for access mic and camera
+const checkPermission = async () => {
+  // const micPermission = await systemPreferences.askForMediaAccess("microphone");
+  // const cameraPermission = await systemPreferences.askForMediaAccess("camera");
+  // if(!micPermission) {
+  //   shell.openExternal(
+  //     "x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone"
+  //   );
+  // } else if(!cameraPermission) {
+  //   shell.openExternal(
+  //     "x-apple.systempreferences:com.apple.preference.security?Privacy_Camera"
+  //   );
+  // }
+}

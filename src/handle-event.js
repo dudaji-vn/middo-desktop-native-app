@@ -10,9 +10,11 @@ const {
 const { EVENTS } = require("./events");
 const { APP_URL } = require("./config");
 const path = require("path");
+const Store = require('electron-store');
 
 function handleEvents(mainWindow) {
   let canvasWindow;
+  const store = new Store();
   ipcMain.on(EVENTS.GOOGLE_LOGIN, (event, args) => {
     shell.openExternal(APP_URL + "/login-google-electron");
   });
@@ -96,6 +98,24 @@ function handleEvents(mainWindow) {
       canvasWindow.webContents.send(EVENTS.SEND_DOODLE_SHARE_SCREEN, args);
     }
   })
+
+  ipcMain.on(EVENTS.STORE_FCM_TOKEN, (e, token) => {
+    store.set('fcm_token', token);
+  });
+  
+  ipcMain.on("getFCMToken", async (e) => {
+    e.sender.send('getFCMToken', store.get('fcm_token'));
+  });
+  
+  ipcMain.on(EVENTS.SHOW_NOTIFICATION, (e, data) => {
+    const {title, body, url} = data;
+    const myNotification = new Notification({ title, body });
+    myNotification.onclick = () => {
+      console.log('Notification clicked::', url);
+      myNotification.close();
+    }
+    myNotification.show();
+  });
 
 }
 

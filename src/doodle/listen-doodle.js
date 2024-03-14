@@ -29,6 +29,7 @@ class Doodle {
     if (index && this.doodle[index].timer) {
       clearTimeout(this.doodle[index].timer);
     }
+    // if(image == this.doodle[index].image) return;
 
     if (oldImage) {
       oldImage.src = image;
@@ -49,7 +50,7 @@ class Doodle {
       if (oldImage) {
         oldImage.remove();
       }
-    }, 5000);
+    }, 20000);
 
     this.doodle[index].timer = timer;
   }
