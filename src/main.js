@@ -2,6 +2,7 @@ const {
   app,
   BrowserWindow,
   ipcMain,
+  Notification,
   shell,
   systemPreferences,
   screen,
@@ -119,3 +120,23 @@ const checkPermission = async () => {
   //   );
   // }
 }
+
+
+ipcMain.on(EVENTS.SHOW_NOTIFICATION, (e, data) => {
+  // Check is focused
+  const isFocused = mainWindow.isFocused();
+  if(isFocused) return;
+  const {title, body, url} = data;
+  const myNotification = new Notification({ 
+    title, 
+    body,
+    sound: path.join(__dirname, 'assets', 'notification.mp3'),
+    icon: path.join(__dirname, 'assets', 'icon.png'),
+    silent: false
+  });
+  myNotification.onclick = () => {
+    console.log('Notification clicked::', url);
+    myNotification.close();
+  }
+  myNotification.show();
+});

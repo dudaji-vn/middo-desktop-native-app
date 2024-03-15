@@ -106,16 +106,7 @@ function handleEvents(mainWindow) {
   ipcMain.on("getFCMToken", async (e) => {
     e.sender.send('getFCMToken', store.get('fcm_token'));
   });
-  
-  ipcMain.on(EVENTS.SHOW_NOTIFICATION, (e, data) => {
-    const {title, body, url} = data;
-    const myNotification = new Notification({ title, body });
-    myNotification.onclick = () => {
-      console.log('Notification clicked::', url);
-      myNotification.close();
-    }
-    myNotification.show();
-  });
+
 
 }
 

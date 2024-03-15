@@ -52,16 +52,16 @@ ipcRenderer.on(TOKEN_UPDATED, (_, token) => {
 // Display notification
 ipcRenderer.on(NOTIFICATION_RECEIVED, (_, serverNotificationPayload) => {
   if (serverNotificationPayload.data){
-    // ipcRenderer.send(EVENTS.SHOW_NOTIFICATION, serverNotificationPayload.data)
-    const notify = new Notification(serverNotificationPayload.data.title, {
-      body: serverNotificationPayload.data.body
-    })
-    console.log('Notification received::', serverNotificationPayload.data);
+    ipcRenderer.send(EVENTS.SHOW_NOTIFICATION, serverNotificationPayload.data)
+    // const notify = new Notification(serverNotificationPayload.data.title, {
+    //   body: serverNotificationPayload.data.body,
+    // })
+    // console.log('Notification received::', serverNotificationPayload.data);
 
-    notify.onclick = () => {
-      console.log('Notification clicked::', serverNotificationPayload.data.url);
-      // ipcRenderer.send(EVENTS.SHOW_NOTIFICATION, serverNotificationPayload.data)
-    }
+    // notify.onclick = () => {
+    //   console.log('Notification clicked::', serverNotificationPayload.data.url);
+    //   // ipcRenderer.send(EVENTS.SHOW_NOTIFICATION, serverNotificationPayload.data)
+    // }
   }
 })
 
