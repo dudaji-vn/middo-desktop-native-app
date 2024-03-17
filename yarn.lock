@@ -930,7 +930,7 @@ bluebird-lst@^1.0.9:
   dependencies:
     bluebird "^3.5.5"
 
-bluebird@^3.1.1, bluebird@^3.5.0, bluebird@^3.5.5:
+bluebird@^3.1.1, bluebird@^3.5.0, bluebird@^3.5.5, bluebird@^3.7.2:
   version "3.7.2"
   resolved "https://registry.yarnpkg.com/bluebird/-/bluebird-3.7.2.tgz#9f229c15be272454ffa973ace0dbee79a1b0c36f"
   integrity sha512-XpNj6GDQzdfW+r2Wnn7xiSAd7TM3jzkxGXBGTtWKuSXv1xUV+azxAm8jdWZN06QTQk+2N2XB9jRDkvbmQmcRtg==
@@ -1076,6 +1076,13 @@ chalk@^4.0.0, chalk@^4.0.2, chalk@^4.1.0, chalk@^4.1.1, chalk@^4.1.2:
   dependencies:
     ansi-styles "^4.1.0"
     supports-color "^7.1.0"
+
+check-internet-connected@^2.0.6:
+  version "2.0.6"
+  resolved "https://registry.yarnpkg.com/check-internet-connected/-/check-internet-connected-2.0.6.tgz#5fea9998ca2173d9ac77b1e47c17c4f90c731997"
+  integrity sha512-ZoU3ovnutroET6nWLp7zt7Er03aLQc4VqMZEBEuWhU/uI8B1x8j3v3rFcufEugNXUxZ7SPF4eMCufJ3vY7Ha2A==
+  dependencies:
+    bluebird "^3.7.2"
 
 chownr@^2.0.0:
   version "2.0.0"

@@ -1,8 +1,6 @@
 const {
   ipcMain,
-  Notification,
   shell,
-  screen,
   systemPreferences,
   desktopCapturer,
   BrowserWindow,
@@ -51,13 +49,13 @@ function handleEvents(mainWindow) {
   });
 
   ipcMain.on(EVENTS.SHARE_SCREEN_SUCCESS, (e, args) => {
+    const isMac = process.platform === 'darwin';
     canvasWindow = new BrowserWindow({
       transparent: true,
-      frame: true,
+      frame: isMac,
       alwaysOnTop: true,
       modal: true,
       show: false,
-      fullscreenable: true,
       roundedCorners: false,
       fullscreen: true,
       simpleFullscreen: true,
@@ -77,13 +75,11 @@ function handleEvents(mainWindow) {
     canvasWindow.setPosition(0, 0); 
     canvasWindow.maximize()
     canvasWindow.show()
-    canvasWindow.on('enter-full-screen', () => {
-      screen.showHideMenuBar(false);
-    });
 
     // add onload event
     canvasWindow.webContents.on('did-finish-load', () => {
       canvasWindow.webContents.send(EVENTS.CALL_STATUS, args);
+      canvasWindow.setFullScreen(true);
     });
   });
 

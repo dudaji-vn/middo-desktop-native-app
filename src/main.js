@@ -3,14 +3,12 @@ const {
   BrowserWindow,
   ipcMain,
   Notification,
-  shell,
-  systemPreferences,
-  screen,
 } = require("electron");
 require('dotenv').config()
 const path = require("path");
 const { setup: setupPushReceiver } = require("electron-push-receiver");
 const url = require('url');
+const checkInternetConnected = require('check-internet-connected');
 const handleEvents = require("./handle-event");
 const { EVENTS } = require("./events");
 const { APP_URL } = require("./config");
@@ -63,14 +61,27 @@ function loginCallback(urlStr) {
   mainWindow.webContents.send(EVENTS.GOOGLE_LOGIN_SUCCESS, { token, refresh_token });
 }
 
-function createWindow() {
-  const screenSize = screen.getPrimaryDisplay().workAreaSize;
+async function createWindow() {
+  // Check have internet connection
+  const isOnline = await checkInternetConnected();
+  if(!isOnline) {
+    const errorWindow = new BrowserWindow({
+      width: 800,
+      height: 600,
+      webPreferences: {
+        contextIsolation: true,
+        nodeIntegration: true,
+        preload: path.join(__dirname, "preload.js"),
+      },
+    });
+    errorWindow.loadFile(path.join(__dirname, "error.html"));
+    return;
+  }
+
   mainWindow = new BrowserWindow({
     title: "Middo",
     // backgroundColor: '#2e2c29',
     icon: path.join(__dirname, "src", "assets", "icon.ico"),
-    width: screenSize.width,
-    height: screenSize.height,
     // alwaysOnTop: true,
     webPreferences: {
       contextIsolation: true,
@@ -79,7 +90,8 @@ function createWindow() {
     },
   });
   // Hide menu bar
-  // mainWindow.setMenu(null);
+  mainWindow.setMenu(null);
+  mainWindow.maximize();
   mainWindow.loadURL(APP_URL);
   // mainWindow.webContents.openDevTools();
   setupPushReceiver(mainWindow.webContents);
