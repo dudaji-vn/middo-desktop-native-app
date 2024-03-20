@@ -4,6 +4,7 @@ const {
   systemPreferences,
   desktopCapturer,
   BrowserWindow,
+  Notification
 } = require("electron");
 const { EVENTS } = require("./events");
 const { APP_URL } = require("./config");
@@ -140,7 +141,6 @@ function handleEvents(mainWindow) {
       silent: false
     });
     myNotification.onclick = () => {
-      console.log('Notification clicked::', url);
       myNotification.close();
     }
     myNotification.show();
