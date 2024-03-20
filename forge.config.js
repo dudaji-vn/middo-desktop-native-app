@@ -30,6 +30,7 @@ module.exports = {
       config: {
         name: 'Middo',
         icon: path.join(process.cwd(), "src", "assets", "icon.icns"),
+        // background: path.join(process.cwd(), "src", "assets", "background-mac.tiff"),
         overwrite: true,
         format: 'ULFO',
       },
