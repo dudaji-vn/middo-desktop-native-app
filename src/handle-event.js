@@ -1,3 +1,4 @@
+require('dotenv').config()
 const {
   ipcMain,
   shell,
@@ -131,7 +132,8 @@ function handleEvents(mainWindow) {
   ipcMain.on(EVENTS.SHOW_NOTIFICATION, (e, data) => {
     // Check is focused
     const isFocused = mainWindow.isFocused();
-    if(isFocused) return;
+    const currentPath = mainWindow.webContents.getURL();
+    if(currentPath.includes('talk') && isFocused) return;
     const {title, body, url} = data;
     const myNotification = new Notification({ 
       title, 
@@ -140,14 +142,13 @@ function handleEvents(mainWindow) {
       icon: path.join(__dirname, 'assets', 'icon.png'),
       silent: false
     });
-    myNotification.onclick = () => {
-      myNotification.close();
-    }
+    myNotification.on('click', () => {
+        mainWindow.webContents.send('OPEN_URL', url);
+        myNotification.close();
+    });
     myNotification.show();
   });
   // End notification
-
-
 }
 
 module.exports = handleEvents;
