@@ -1,27 +1,32 @@
+require('dotenv').config();
 const { FusesPlugin } = require('@electron-forge/plugin-fuses');
 const { FuseV1Options, FuseVersion } = require('@electron/fuses');
 const { utils: { fromBuildIdentifier } } = require('@electron-forge/core');
-const { APPLE_ID, APPLE_PASSWORD, APPLE_TEAM_ID } = require('./src/config');
 const path = require("path");
 module.exports = {
   buildIdentifier: 'prod',
   packagerConfig: {
     icon: path.join(process.cwd(), "src", "assets", "icon.icns"),
     asar: true,
-    // appBundleId: fromBuildIdentifier({ beta: 'middo', prod: 'middo' }),
     protocols: [
       {
         "name": "Middo",
         "schemes": ["middo"]
       }
-    ]
-    // osxSign: {},
-    // osxNotarize: {
-    //   tool: 'notarytool',
-    //   appleId: APPLE_ID,
-    //   appleIdPassword: APPLE_PASSWORD,
-    //   teamId: APPLE_TEAM_ID
-    // }
+    ],
+    osxSign: {
+      identity: process.env.TEAM_ID,
+      hardenedRuntime: true,
+      gatekeeperAssess: false,
+      entitlements: path.join(process.cwd(), "entitlements.mac.plist"),
+      entitlementsInherit: path.join(process.cwd(), "entitlements.mac.plist"),
+    },
+    osxNotarize: {
+      tool: 'notarytool',
+      appleId: process.env.APPLE_ID,
+      appleIdPassword: process.env.APPLE_ID_PASSWORD,
+      teamId: process.env.TEAM_ID,
+    }
   },
   rebuildConfig: {},
   makers: [
