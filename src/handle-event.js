@@ -110,7 +110,8 @@ function handleEvents(mainWindow) {
   //
   ipcMain.on('set-ignore-mouse-events', (event, ignore, options) => {
     const win = BrowserWindow.fromWebContents(event.sender)
-    win.setIgnoreMouseEvents(ignore, options)
+    if(!win) return;
+    win.setIgnoreMouseEvents(ignore, { forward: true })
   })
 
   // Event for drag able bar

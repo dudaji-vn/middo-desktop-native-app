@@ -47,6 +47,10 @@ body::after {
   gap: 12px;
   justify-content: center;
   align-items: center;
+  cursor: grab;
+}
+.dragable:active {
+  cursor: grabbing;
 }
 .btn {
   padding: 10px;
