@@ -79,7 +79,7 @@ function handleEvents(mainWindow) {
     // canvasWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
     // canvasWindow.setAlwaysOnTop(true, '', 1);
     canvasWindow.setIgnoreMouseEvents(true, { forward: true })
-    canvasWindow.loadFile(path.join(__dirname, "doodle", "canvas.html"))
+    canvasWindow.loadFile(path.join(__dirname, "doodle", "index.html"))
     canvasWindow.setPosition(0, 0); 
     canvasWindow.maximize()
     canvasWindow.show()

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Middo Doodle</title>
+    <link rel="stylesheet" href="./assets/css/style.css" />
+  </head>
+  <body>
+    <div class="image-list"></div>
+    <div id="draw" class="draw"></div>
+    <div class="dragable interactive">
+      <button class="btn toggle-draw">
+        <img class="on" src="./assets/images/draw-on.svg" alt="" />
+        <img class="off" src="./assets/images/draw-off.svg" alt="" />
+      </button>
+      <button class="btn active toggle-mic">
+        <img class="on" src="./assets/images/mic-on.svg" alt="" />
+        <img class="off" src="./assets/images/mic-off.svg" alt="" />
+      </button>
+      <button class="btn toggle-camera">
+        <img class="on" src="./assets/images/camera-on.svg" alt="" />
+        <img class="off" src="./assets/images/camera-off.svg" alt="" />
+      </button>
+      <button class="btn active stop-share">
+        <img class="on" src="./assets/images/share-screen.svg" alt="" />
+      </button>
+    </div>
+
+    <script src="./assets/vendor/konva.min.js"></script>
+    <script src="./assets/js/load-event-mouse.js"></script>
+    <script src="./assets/js/listen-doodle.js"></script>
+    <script src="./assets/js/dragable-bar.js"></script>
+    <script src="./assets/js/actions.js"></script>
+    <script src="./assets/js/drawing.js"></script>
+  </body>
+</html>

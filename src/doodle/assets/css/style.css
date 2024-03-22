@@ -83,7 +83,7 @@ body::after {
   display: none;
 }
 
-canvas#draw {
+#draw {
   position: absolute;
   top: 0;
   left: 0;
@@ -91,5 +91,5 @@ canvas#draw {
   height: 100%;
   z-index: 8;
   display: none;
-  cursor: url("./images/circle.png") 5 5, auto;
+  cursor: url("../images/circle.png") 5 5, auto;
 }

@@ -4,7 +4,7 @@ let btnToggleMic = document.querySelector(".toggle-mic");
 let btnToggleCamera = document.querySelector(".toggle-camera");
 let btnStopShare = document.querySelector(".stop-share");
 
-let canvas = document.querySelector("canvas#draw");
+let canvas = document.querySelector("#draw");
 btnToggleDraw.addEventListener("click", () => {
   const isActive = btnToggleDraw.classList.contains("active");
   if (isActive) {
@@ -60,42 +60,42 @@ if (ipcRenderer) {
 
 
 // Canvas draw
-let timer = null;
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-const ctx = canvas.getContext("2d");
-let painting = false;
-function startPosition(e) {
-  painting = true;
-  draw(e);
-  if(timer) {
-    clearTimeout(timer);
-  }
-}
+// let timer = null;
+// canvas.width = window.innerWidth;
+// canvas.height = window.innerHeight;
+// const ctx = canvas.getContext("2d");
+// let painting = false;
+// function startPosition(e) {
+//   painting = true;
+//   draw(e);
+//   if(timer) {
+//     clearTimeout(timer);
+//   }
+// }
 
-function endPosition() {
-  painting = false;
-  ctx.beginPath();
-  timer = setTimeout(() => {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-  }, 3000);
-}
+// function endPosition() {
+//   painting = false;
+//   ctx.beginPath();
+//   timer = setTimeout(() => {
+//     ctx.clearRect(0, 0, canvas.width, canvas.height);
+//   }, 3000);
+// }
 
-function draw(e) {
-  if (!painting) return;
+// function draw(e) {
+//   if (!painting) return;
 
-  ctx.lineWidth = 8;
-  ctx.lineCap = "round";
-  ctx.strokeStyle = "#000000";
+//   ctx.lineWidth = 8;
+//   ctx.lineCap = "round";
+//   ctx.strokeStyle = "#000000";
 
-  ctx.lineTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
-}
+//   ctx.lineTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+//   ctx.stroke();
+//   ctx.beginPath();
+//   ctx.moveTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+// }
 
-canvas.addEventListener("mousedown", startPosition);
-canvas.addEventListener("mouseup", endPosition);
-canvas.addEventListener("mousemove", draw);
+// canvas.addEventListener("mousedown", startPosition);
+// canvas.addEventListener("mouseup", endPosition);
+// canvas.addEventListener("mousemove", draw);
 
 // Make line draw of canvas fade out and remove
