@@ -5,12 +5,14 @@ const {
   systemPreferences,
   desktopCapturer,
   BrowserWindow,
-  Notification
+  Notification,
 } = require("electron");
 const { EVENTS } = require("./events");
 const { APP_URL } = require("./config");
 const path = require("path");
 const Store = require('electron-store');
+const emitter = require('events');
+emitter.setMaxListeners();
 
 function handleEvents(mainWindow) {
   let canvasWindow;
@@ -74,9 +76,9 @@ function handleEvents(mainWindow) {
     //   mode: 'detach'
     // })
     // canvasWindow.setParentWindow(mainWindow)
-    canvasWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
-    canvasWindow.setAlwaysOnTop(true, 'pop-up-menu', 1);
-    // canvasWindow.setIgnoreMouseEvents(true, { forward: true })
+    // canvasWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
+    // canvasWindow.setAlwaysOnTop(true, '', 1);
+    canvasWindow.setIgnoreMouseEvents(true, { forward: true })
     canvasWindow.loadFile(path.join(__dirname, "doodle", "canvas.html"))
     canvasWindow.setPosition(0, 0); 
     canvasWindow.maximize()
@@ -132,9 +134,10 @@ function handleEvents(mainWindow) {
   ipcMain.on(EVENTS.SHOW_NOTIFICATION, (e, data) => {
     // Check is focused
     const isFocused = mainWindow.isFocused();
-    const currentPath = mainWindow.webContents.getURL();
-    if(currentPath.includes('talk') && isFocused) return;
+    let currentPathName = new URL(mainWindow.webContents.getURL())?.pathname;
     const {title, body, url} = data;
+    let notifyPathName = new URL(url)?.pathname;
+    if(currentPathName == notifyPathName && isFocused) return;
     const myNotification = new Notification({ 
       title, 
       body,
