@@ -87,7 +87,11 @@ async function createWindow() {
 
 function createTray() {
   if(tray) return;
-  const icon = nativeImage.createFromPath(path.join(__dirname, "assets", IS_MAC ? 'tray.png' : "icon.ico"))
+  const imageFileName = IS_MAC ? 'trayTemplate.png' : "icon.ico";
+  const icon = nativeImage.createFromPath(path.join(__dirname, "assets", imageFileName));
+  if(IS_MAC) {
+    icon.isMacTemplateImage = true;
+  }
   tray = new Tray(icon)
   const contextMenu = Menu.buildFromTemplate([
     { label: "Open Middo", type: "normal", click: () => mainWindow.show() },
