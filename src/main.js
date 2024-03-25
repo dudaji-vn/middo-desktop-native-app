@@ -1,5 +1,5 @@
 require('dotenv').config()
-const { app, BrowserWindow } = require("electron");
+const { app, BrowserWindow, Tray, nativeImage, Menu } = require("electron");
 const path = require("path");
 const { setup: setupPushReceiver } = require("electron-push-receiver");
 const url = require('url');
@@ -9,6 +9,7 @@ const { EVENTS } = require("./events");
 const { APP_URL } = require("./config");
 
 let mainWindow;
+let tray
 
 // Set deep links
 if (process.defaultApp) {
@@ -21,33 +22,23 @@ if (process.defaultApp) {
   app.setAsDefaultProtocolClient("middo");
 }
 
-const gotTheLock = app.requestSingleInstanceLock();
-if (!gotTheLock) {
-  app.quit();
-} else {
-  app.on("second-instance", (event, commandLine, workingDirectory) => {
-    if (mainWindow) {
-      if (mainWindow.isMinimized()) mainWindow.restore();
-      mainWindow.focus();
-    }
-    loginCallback(commandLine.pop().slice(0, -1));
-  });
 
-  // Create mainWindow, load the rest of the app, etc...
-  app.whenReady().then(() => {
-    createWindow();
-    app.setAppUserModelId("middo")
-    app.on('activate', () => {
-      if (BrowserWindow.getAllWindows().length === 0) {
-        createWindow()
-      }
-    })
-  });
+app.on("second-instance", (event, commandLine, workingDirectory) => {
+  if (mainWindow) {
+    if (mainWindow.isMinimized()) mainWindow.restore();
+    mainWindow.focus();
+  }
+  loginCallback(commandLine.pop().slice(0, -1));
+});
 
-  app.on("open-url", (event, url) => {
-    loginCallback(url);
-  });
-}
+// Create mainWindow, load the rest of the app, etc...
+app.whenReady().then(() => {
+  createTray();
+});
+
+app.on("open-url", (event, url) => {
+  loginCallback(url);
+});
 
 function loginCallback(urlStr) {
   const query = url.parse(urlStr, true).query;
@@ -87,12 +78,60 @@ async function createWindow() {
   mainWindow.setMenu(null);
   mainWindow.maximize();
   mainWindow.loadURL(APP_URL);
+  mainWindow.on("close", (event) => {
+    event.preventDefault();
+    // mainWindow.hide();
+    if(mainWindow.isMinimized()) mainWindow.restore();
+    else mainWindow.minimize();
+  });
+
+  mainWindow.on("show", () => {
+    app.dock.show();
+    mainWindow.setSkipTaskbar(false);
+  });
+
+  mainWindow.on("hide", () => {
+    app.dock.hide();
+    mainWindow.setSkipTaskbar(true);
+  });
   // mainWindow.webContents.openDevTools();
   setupPushReceiver(mainWindow.webContents);
   handleEvents(mainWindow);
 }
 
+function createTray() {
+  const icon = nativeImage.createFromPath(path.join(__dirname, "assets", "tray.png"))
+  tray = new Tray(icon)
+  const contextMenu = Menu.buildFromTemplate([
+    { label: "Open Middo", type: "normal", click: () => mainWindow.show() },
+    { label: "Quit", type: "normal", click: () => {
+      app.quit();
+    } },
+  ])
+  tray.setToolTip('Middo')
+  tray.setContextMenu(contextMenu)
+  // tray.addListener("click", () => createWindow());
+}
+app.on("ready", createWindow);
+app.on("activate", () => {
+  // On OS X it's common to re-create a window in the app when the
+  // dock icon is clicked and there are no other windows open.
+  if (BrowserWindow.getAllWindows().length === 0) {
+    createWindow();
+  }
+});
+
+function handleQuit() {
+  if (process.platform !== "darwin") {
+    app.quit();
+  }
+}
 
 app.on('window-all-closed', function () {
-  if (process.platform !== 'darwin') app.quit()
+  handleQuit();
 })
+
+app.on("before-quit", (event) => {
+  const windows = BrowserWindow.getAllWindows();
+  windows.forEach((window) => window.destroy());
+});

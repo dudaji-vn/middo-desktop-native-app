@@ -148,6 +148,8 @@ function handleEvents(mainWindow) {
     });
     myNotification.on('click', () => {
         mainWindow.webContents.send('OPEN_URL', url);
+        mainWindow.show();
+        mainWindow.focus();
         myNotification.close();
     });
     myNotification.show();
