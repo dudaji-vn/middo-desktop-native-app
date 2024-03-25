@@ -82,7 +82,7 @@ async function createWindow() {
     return false
   });
   setupPushReceiver(mainWindow.webContents);
-  handleEvents(mainWindow, tray);
+  handleEvents(mainWindow);
 }
 
 function createTray() {
@@ -107,6 +107,10 @@ app.on("ready", ()=>{
   createWindow();
 });
 app.on("activate", () => {
+  if(mainWindow) {
+    mainWindow.show();
+    return;
+  }
   if (BrowserWindow.getAllWindows().length === 0) {
     createTray();
     createWindow();
