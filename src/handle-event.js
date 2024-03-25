@@ -14,7 +14,7 @@ const Store = require('electron-store');
 const emitter = require('events');
 emitter.setMaxListeners();
 
-function handleEvents(mainWindow) {
+function handleEvents(mainWindow, tray) {
   let canvasWindow;
   const store = new Store();
 
@@ -133,7 +133,13 @@ function handleEvents(mainWindow) {
     e.sender.send('getFCMToken', store.get('fcm_token'));
   });
   ipcMain.on(EVENTS.SHOW_NOTIFICATION, (e, data) => {
-    // Check is focused
+    tray.setToolTip('You have a new notification!')
+    tray.on('click', () => {
+      mainWindow.show();
+      mainWindow.focus();
+      mainWindow.webContents.send('OPEN_URL', url);
+      tray.setToolTip('Middo')
+    });
     const isFocused = mainWindow.isFocused();
     let currentPathName = new URL(mainWindow.webContents.getURL())?.pathname;
     const {title, body, url} = data;
@@ -151,6 +157,7 @@ function handleEvents(mainWindow) {
         mainWindow.show();
         mainWindow.focus();
         myNotification.close();
+        tray.setToolTip('Middo')
     });
     myNotification.show();
   });
