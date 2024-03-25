@@ -39,7 +39,7 @@ module.exports = {
         overwrite: true,
         format: 'ULFO',
       },
-    },
+    }
   ],
   plugins: [
     {
