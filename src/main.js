@@ -11,6 +11,7 @@ const { APP_URL } = require("./config");
 let mainWindow;
 let tray
 const IS_MAC = process.platform === 'darwin';
+app.setAppUserModelId("com.middo.app");
 
 // Set deep links
 if (process.defaultApp) {
@@ -22,7 +23,11 @@ if (process.defaultApp) {
 } else {
   app.setAsDefaultProtocolClient("middo");
 }
-
+const gotTheLock = app.requestSingleInstanceLock()
+if (!gotTheLock) {
+  app.quit()
+  return;
+}
 // Set single instance
 app.on("second-instance", (event, commandLine, workingDirectory) => {
   if (mainWindow) {
