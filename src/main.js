@@ -1,5 +1,5 @@
 require('dotenv').config()
-const { app, BrowserWindow } = require("electron");
+const { app, BrowserWindow, Tray, nativeImage, Menu } = require("electron");
 const path = require("path");
 const { setup: setupPushReceiver } = require("electron-push-receiver");
 const url = require('url');
@@ -9,6 +9,9 @@ const { EVENTS } = require("./events");
 const { APP_URL } = require("./config");
 
 let mainWindow;
+let tray
+const IS_MAC = process.platform === 'darwin';
+app.setAppUserModelId("com.middo.app");
 
 // Set deep links
 if (process.defaultApp) {
@@ -20,34 +23,23 @@ if (process.defaultApp) {
 } else {
   app.setAsDefaultProtocolClient("middo");
 }
-
-const gotTheLock = app.requestSingleInstanceLock();
+const gotTheLock = app.requestSingleInstanceLock()
 if (!gotTheLock) {
-  app.quit();
-} else {
-  app.on("second-instance", (event, commandLine, workingDirectory) => {
-    if (mainWindow) {
-      if (mainWindow.isMinimized()) mainWindow.restore();
-      mainWindow.focus();
-    }
-    loginCallback(commandLine.pop().slice(0, -1));
-  });
-
-  // Create mainWindow, load the rest of the app, etc...
-  app.whenReady().then(() => {
-    createWindow();
-    app.setAppUserModelId("middo")
-    app.on('activate', () => {
-      if (BrowserWindow.getAllWindows().length === 0) {
-        createWindow()
-      }
-    })
-  });
-
-  app.on("open-url", (event, url) => {
-    loginCallback(url);
-  });
+  app.quit()
+  return;
 }
+// Set single instance
+app.on("second-instance", (event, commandLine, workingDirectory) => {
+  if (mainWindow) {
+    if (mainWindow.isMinimized()) mainWindow.restore();
+    mainWindow.focus();
+  }
+  loginCallback(commandLine.pop().slice(0, -1));
+});
+
+app.on("open-url", (event, url) => {
+  loginCallback(url);
+});
 
 function loginCallback(urlStr) {
   const query = url.parse(urlStr, true).query;
@@ -87,12 +79,60 @@ async function createWindow() {
   mainWindow.setMenu(null);
   mainWindow.maximize();
   mainWindow.loadURL(APP_URL);
-  // mainWindow.webContents.openDevTools();
+
+  // Handle prevent close to run in background
+  mainWindow.on("close", (event) => {
+    event.preventDefault();
+    mainWindow.hide();
+    return false
+  });
   setupPushReceiver(mainWindow.webContents);
   handleEvents(mainWindow);
 }
 
+function createTray() {
+  if(tray) return;
+  const imageFileName = IS_MAC ? 'trayTemplate.png' : "icon.ico";
+  const icon = nativeImage.createFromPath(path.join(__dirname, "assets", imageFileName));
+  if(IS_MAC) {
+    icon.isMacTemplateImage = true;
+  }
+  tray = new Tray(icon)
+  const contextMenu = Menu.buildFromTemplate([
+    { label: "Open Middo", type: "normal", click: () => mainWindow.show() },
+    { label: "Quit", type: "normal", click: () => {
+      app.quit();
+    } },
+  ])
+  tray.setToolTip('Middo')
+  tray.setContextMenu(contextMenu)
+}
+app.on("ready", ()=>{
+  createTray();
+  createWindow();
+});
+app.on("activate", () => {
+  if(mainWindow) {
+    mainWindow.show();
+    return;
+  }
+  if (BrowserWindow.getAllWindows().length === 0) {
+    createTray();
+    createWindow();
+  }
+});
+
+function handleQuit() {
+  if (process.platform !== "darwin") {
+    app.quit();
+  }
+}
 
 app.on('window-all-closed', function () {
-  if (process.platform !== 'darwin') app.quit()
+  handleQuit();
 })
+
+app.on("before-quit", (event) => {
+  const windows = BrowserWindow.getAllWindows();
+  windows.forEach((window) => window.destroy());
+});

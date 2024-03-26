@@ -79,7 +79,7 @@ function handleEvents(mainWindow) {
     // canvasWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
     // canvasWindow.setAlwaysOnTop(true, '', 1);
     canvasWindow.setIgnoreMouseEvents(true, { forward: true })
-    canvasWindow.loadFile(path.join(__dirname, "doodle", "canvas.html"))
+    canvasWindow.loadFile(path.join(__dirname, "doodle", "index.html"))
     canvasWindow.setPosition(0, 0); 
     canvasWindow.maximize()
     canvasWindow.show()
@@ -110,7 +110,8 @@ function handleEvents(mainWindow) {
   //
   ipcMain.on('set-ignore-mouse-events', (event, ignore, options) => {
     const win = BrowserWindow.fromWebContents(event.sender)
-    win.setIgnoreMouseEvents(ignore, options)
+    if(!win) return;
+    win.setIgnoreMouseEvents(ignore, { forward: true })
   })
 
   // Event for drag able bar
@@ -132,7 +133,6 @@ function handleEvents(mainWindow) {
     e.sender.send('getFCMToken', store.get('fcm_token'));
   });
   ipcMain.on(EVENTS.SHOW_NOTIFICATION, (e, data) => {
-    // Check is focused
     const isFocused = mainWindow.isFocused();
     let currentPathName = new URL(mainWindow.webContents.getURL())?.pathname;
     const {title, body, url} = data;
@@ -147,6 +147,8 @@ function handleEvents(mainWindow) {
     });
     myNotification.on('click', () => {
         mainWindow.webContents.send('OPEN_URL', url);
+        mainWindow.show();
+        mainWindow.focus();
         myNotification.close();
     });
     myNotification.show();

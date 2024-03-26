@@ -40,6 +40,19 @@ module.exports = {
         format: 'ULFO',
       },
     },
+    {
+      name: '@electron-forge/maker-squirrel',
+      config: { 
+        name: "middo",
+        "author": "Middo",
+        "description": "Middo translation app",
+        "iconUrl": path.join(process.cwd(), "src", "assets", "icon.ico"),
+        "setupIcon": path.join(process.cwd(), "src", "assets", "icon.ico"),
+        "loadingGif": path.join(process.cwd(), "src", "assets", "loading.gif"),
+        // certificateFile: './cert.pfx',
+        // certificatePassword: process.env.CERTIFICATE_PASSWORD
+      }
+    },
   ],
   plugins: [
     {
