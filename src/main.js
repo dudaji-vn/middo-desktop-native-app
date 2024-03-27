@@ -97,7 +97,7 @@ function createTray() {
   if(IS_MAC) {
     icon.isMacTemplateImage = true;
   }
-  tray = new Tray(icon)
+  tray = new Tray(icon, "Middo")
   const contextMenu = Menu.buildFromTemplate([
     { label: "Open Middo", type: "normal", click: () => mainWindow.show() },
     { label: "Quit", type: "normal", click: () => {
