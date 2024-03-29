@@ -1,12 +1,22 @@
 require('dotenv').config();
 const { FusesPlugin } = require('@electron-forge/plugin-fuses');
 const { FuseV1Options, FuseVersion } = require('@electron/fuses');
-const { utils: { fromBuildIdentifier } } = require('@electron-forge/core');
 const path = require("path");
 module.exports = {
   buildIdentifier: 'prod',
   packagerConfig: {
     icon: path.join(process.cwd(), "src", "assets", "icon.icns"),
+    appBundleId: "com.middo.app",
+    name: "Middo",
+    executableName: "Middo",
+    win32metadata: {
+      CompanyName: "DudajiVn",
+      FileDescription: "Middo translation app",
+      OriginalFilename: "Middo",
+      ProductName: "Middo",
+      InternalName: "Middo",
+      // "requested-execution-level": "requireAdministrator",
+    },
     asar: true,
     protocols: [
       {
@@ -44,11 +54,11 @@ module.exports = {
       name: '@electron-forge/maker-squirrel',
       config: { 
         name: "middo",
-        "author": "Middo",
-        "description": "Middo translation app",
-        "iconUrl": path.join(process.cwd(), "src", "assets", "icon.ico"),
-        "setupIcon": path.join(process.cwd(), "src", "assets", "icon.ico"),
-        "loadingGif": path.join(process.cwd(), "src", "assets", "loading.gif"),
+        author: "DudajiVn",
+        description: "Middo translation app",
+        iconUrl: path.join(process.cwd(), "src", "assets", "icon.ico"),
+        setupIcon: path.join(process.cwd(), "src", "assets", "icon.ico"),
+        loadingGif: path.join(process.cwd(), "src", "assets", "loading.gif"),
         // certificateFile: './cert.pfx',
         // certificatePassword: process.env.CERTIFICATE_PASSWORD
       }
