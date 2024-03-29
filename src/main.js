@@ -12,6 +12,9 @@ let mainWindow;
 let tray;
 const IS_MAC = process.platform === "darwin";
 app.setAppUserModelId("com.middo.app");
+if(!IS_MAC) {
+  if(require('electron-squirrel-startup')) app.quit();
+}
 
 // Set deep links
 if (process.defaultApp) {
