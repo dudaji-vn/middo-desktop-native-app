@@ -7,7 +7,8 @@ const checkInternetConnected = require("check-internet-connected");
 const handleEvents = require("./handle-event");
 const { EVENTS } = require("./events");
 const { APP_URL } = require("./config");
-
+// const { updateElectronApp } = require('update-electron-app');
+// updateElectronApp();
 let mainWindow;
 let tray;
 const IS_MAC = process.platform === "darwin";
@@ -91,6 +92,15 @@ if (!gotTheLock) {
       event.preventDefault();
       mainWindow.hide();
       return false;
+    });
+
+    // check when main window is focused
+    mainWindow.on("focus", () => {
+      if(IS_MAC) {
+        app?.dock?.setBadge("");
+      } else {
+        mainWindow.setOverlayIcon(null, '')
+      }
     });
     setupPushReceiver(mainWindow.webContents);
     handleEvents(mainWindow);
