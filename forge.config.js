@@ -63,6 +63,9 @@ module.exports = {
         // certificatePassword: process.env.CERTIFICATE_PASSWORD
       }
     },
+    {
+      name: '@electron-forge/maker-zip'
+    }
   ],
   publishers: [
     {
