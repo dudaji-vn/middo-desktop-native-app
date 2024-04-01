@@ -147,7 +147,7 @@ function handleEvents(mainWindow) {
         app?.dock?.bounce();
         app?.dock?.setBadge('•');
       } else {
-        mainWindow.setOverlayIcon(nativeImage.createFromPath(path.join(__dirname, 'assets', 'icon.png')), 'New notification')
+        mainWindow.setOverlayIcon(nativeImage.createFromPath(path.join(__dirname, 'assets', 'badge.png')), 'New notification')
       }
     }
     const myNotification = new Notification({ 
