@@ -64,18 +64,18 @@ module.exports = {
       }
     },
   ],
-  // publishers: [
-  //   {
-  //     name: '@electron-forge/publisher-github',
-  //     config: {
-  //       repository: {
-  //         owner: 'dudaji-vn',
-  //         name: 'middo-desktop-native-app'
-  //       },
-  //       prerelease: true
-  //     }
-  //   }
-  // ],
+  publishers: [
+    {
+      name: '@electron-forge/publisher-github',
+      config: {
+        repository: {
+          owner: 'dudaji-vn',
+          name: 'middo-desktop-native-app'
+        },
+        prerelease: true
+      }
+    }
+  ],
   plugins: [
     {
       name: '@electron-forge/plugin-auto-unpack-natives',
