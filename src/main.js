@@ -4,6 +4,7 @@ const path = require("path");
 const { setup: setupPushReceiver } = require("electron-push-receiver");
 const url = require("url");
 const checkInternetConnected = require("check-internet-connected");
+const log = require("electron-log");
 const handleEvents = require("./handle-event");
 const { EVENTS } = require("./events");
 const { APP_URL } = require("./config");
@@ -13,6 +14,8 @@ let mainWindow;
 let tray;
 const IS_MAC = process.platform === "darwin";
 app.setAppUserModelId("com.middo.app");
+log.initialize();
+log.transports.file.resolvePathFn = () => __dirname + "/log.log";
 if(!IS_MAC) {
   if(require('electron-squirrel-startup')) app.quit();
 }
@@ -42,6 +45,7 @@ if (!gotTheLock) {
   });
 
   app.on("open-url", (event, url) => {
+    log.info("open-url", url);
     loginCallback(url);
   });
 
@@ -56,6 +60,7 @@ if (!gotTheLock) {
 
   async function createWindow() {
     // Check have internet connection
+    log.info('Start createWindow');
     const isOnline = await checkInternetConnected();
     if (!isOnline) {
       const errorWindow = new BrowserWindow({
@@ -89,6 +94,7 @@ if (!gotTheLock) {
 
     // Handle prevent close to run in background
     mainWindow.on("close", (event) => {
+      log.info("close window and run in background");
       event.preventDefault();
       mainWindow.hide();
       return false;
@@ -158,11 +164,18 @@ if (!gotTheLock) {
   }
 
   app.on("window-all-closed", function () {
+    log.info("window-all-closed");
     handleQuit();
   });
 
   app.on("before-quit", (event) => {
+    log.info("before-quit");
     const windows = BrowserWindow.getAllWindows();
     windows.forEach((window) => window.destroy());
   });
 }
+
+process.on("uncaughtException", (error) => {
+  log.error(error);
+  app.quit();
+});
