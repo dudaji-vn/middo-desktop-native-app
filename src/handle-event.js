@@ -1,18 +1,21 @@
 require('dotenv').config()
 const {
+  app,
   ipcMain,
   shell,
   systemPreferences,
   desktopCapturer,
   BrowserWindow,
   Notification,
+  nativeImage,
 } = require("electron");
 const { EVENTS } = require("./events");
 const { APP_URL } = require("./config");
 const path = require("path");
 const Store = require('electron-store');
 const emitter = require('events');
-emitter.setMaxListeners();
+// emitter.setMaxListeners();
+const IS_MAC = process.platform === "darwin";
 
 function handleEvents(mainWindow) {
   let canvasWindow;
@@ -138,6 +141,15 @@ function handleEvents(mainWindow) {
     const {title, body, url} = data;
     let notifyPathName = new URL(url)?.pathname;
     if(currentPathName == notifyPathName && isFocused) return;
+    if(!isFocused) {
+      // Mac
+      if(IS_MAC) {
+        app?.dock?.bounce();
+        app?.dock?.setBadge('•');
+      } else {
+        mainWindow.setOverlayIcon(nativeImage.createFromPath(path.join(__dirname, 'assets', 'badge.png')), 'New notification')
+      }
+    }
     const myNotification = new Notification({ 
       title, 
       body,
