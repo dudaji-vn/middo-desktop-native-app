@@ -5,7 +5,6 @@ const STATUS = {
 window.addEventListener("DOMContentLoaded", () => {
   const interactiveElements = document.querySelectorAll(".interactive");
   let currentStatus = STATUS.ENABLE;
-
   const enableMouse = () => {
     if(currentStatus === STATUS.ENABLE) return;
     ipcRenderer.send("set-ignore-mouse-events", false);

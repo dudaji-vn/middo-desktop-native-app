@@ -13,6 +13,7 @@ const EVENTS = {
     CALL_STATUS: 'CALL_STATUS',
     SHOW_NOTIFICATION: 'SHOW_NOTIFICATION',
     STORE_FCM_TOKEN: 'STORE_FCM_TOKEN',
+    SET_IGNORE_MOUSE_EVENT: 'set-ignore-mouse-events'
 }
 
 module.exports = { EVENTS }

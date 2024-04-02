@@ -1,55 +1,31 @@
-require("dotenv").config();
-const { app, BrowserWindow, Tray, nativeImage, Menu, dialog } = require("electron");
-const path = require("path");
+const { app, BrowserWindow } = require("electron");
 const { setup: setupPushReceiver } = require("electron-push-receiver");
 const url = require("url");
-const checkInternetConnected = require("check-internet-connected");
 const log = require("electron-log");
-const handleEvents = require("./handle-event");
-const { EVENTS } = require("./events");
-const { APP_URL } = require("./config");
-const { updateElectronApp } = require('update-electron-app');
-updateElectronApp();
-let mainWindow;
-let tray;
-const IS_MAC = process.platform === "darwin";
-app.setAppUserModelId("com.middo.app");
-log.initialize();
-log.transports.file.resolvePathFn = () => __dirname + "/log.log";
-if(!IS_MAC) {
-  if(require('electron-squirrel-startup')) app.quit();
-}
 
-// Set deep links
-if (process.defaultApp) {
-  if (process.argv.length >= 2) {
-    app.setAsDefaultProtocolClient("middo", process.execPath, [
-      path.resolve(process.argv[1]),
-    ]);
-  }
-} else {
-  app.setAsDefaultProtocolClient("middo");
-}
+const { EVENTS } = require("./events");
+const { APP_URL, IS_MAC, APP_MODEL_ID } = require("./config");
+
+const globalEvents = require("./global-events");
+const MainScreen = require("./screens/main");
+const DeepLink = require("./setups/deep-link");
+const StartUp = require("./setups/start-up");
+const AutoUpdate = require("./setups/auto-update");
+const LogSystem = require("./setups/log-system");
+const TrayIcon = require("./setups/tray-icon");
+
+app.setAppUserModelId(APP_MODEL_ID);
+new LogSystem().setup();
+new AutoUpdate().setup();
+new StartUp().setup();
+new DeepLink().setup();
+
 const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) {
   app.quit();
 } else {
-  // Set single instance
-  app.on("second-instance", (event, commandLine, workingDirectory) => {
-    if (mainWindow) {
-      if (mainWindow.isMinimized()) mainWindow.restore();
-      mainWindow.show();
-      mainWindow.focus();
-    }
-    loginCallback(commandLine.pop().slice(0, -1));
-  });
-
-  app.on("open-url", (event, url) => {
-    log.info("open-url", url);
-    loginCallback(url);
-  });
-
-  function loginCallback(urlStr) {
+  let mainWindow;
+  function openUrl(urlStr) {
     const query = url.parse(urlStr, true).query;
     const { token, refresh_token } = query;
     mainWindow.webContents.send(EVENTS.GOOGLE_LOGIN_SUCCESS, {
@@ -57,94 +33,17 @@ if (!gotTheLock) {
       refresh_token,
     });
   }
-
-  async function createWindow() {
-    // Check have internet connection
-    log.info('Start createWindow');
-    const isOnline = await checkInternetConnected();
-    if (!isOnline) {
-      const errorWindow = new BrowserWindow({
-        width: 800,
-        height: 600,
-        webPreferences: {
-          contextIsolation: true,
-          nodeIntegration: true,
-          preload: path.join(__dirname, "preload.js"),
-        },
-      });
-      errorWindow.loadFile(path.join(__dirname, "error.html"));
-      return;
-    }
-
-    mainWindow = new BrowserWindow({
-      title: "Middo",
-      // backgroundColor: '#2e2c29',
-      icon: path.join(__dirname, "src", "assets", "icon.ico"),
-      // alwaysOnTop: true,
-      webPreferences: {
-        contextIsolation: true,
-        nodeIntegration: true,
-        preload: path.join(__dirname, "preload.js"),
-      },
-    });
-    // Hide menu bar
-    mainWindow.setMenu(null);
-    mainWindow.maximize();
-    mainWindow.loadURL(APP_URL);
-
-    // Handle prevent close to run in background
-    mainWindow.on("close", (event) => {
-      log.info("close window and run in background");
-      event.preventDefault();
-      mainWindow.hide();
-      return false;
-    });
-
-    // check when main window is focused
-    mainWindow.on("focus", () => {
-      if(IS_MAC) {
-        app?.dock?.setBadge("");
-      } else {
-        mainWindow.setOverlayIcon(null, '')
-      }
-    });
+  function appReady() {
+    log.info('App is ready');
+    mainWindow = new MainScreen(APP_URL).instance
+    new TrayIcon(mainWindow)
     setupPushReceiver(mainWindow.webContents);
-    handleEvents(mainWindow);
+    globalEvents();
+    
   }
 
-  function createTray() {
-    if (tray) return;
-    const imageFileName = IS_MAC ? "trayTemplate.png" : "icon.ico";
-    const icon = nativeImage.createFromPath(
-      path.join(__dirname, "assets", imageFileName)
-    );
-    if (IS_MAC) {
-      icon.isMacTemplateImage = true;
-    }
-    tray = new Tray(icon);
-    const contextMenu = Menu.buildFromTemplate([
-      { label: "Open Middo", type: "normal", click: () => mainWindow.show() },
-      {
-        label: "Quit",
-        type: "normal",
-        click: () => {
-          app.quit();
-        },
-      },
-    ]);
-    tray.setToolTip("Middo");
-    // tray.setContextMenu(contextMenu)
-    tray.on("right-click", () => {
-      tray.popUpContextMenu(contextMenu);
-    });
-    tray.on("click", () => {
-      mainWindow?.show();
-      mainWindow?.focus();
-    });
-  }
   app.on("ready", () => {
-    createTray();
-    createWindow();
+    appReady();
   });
   app.on("activate", () => {
     if (mainWindow) {
@@ -152,26 +51,29 @@ if (!gotTheLock) {
       return;
     }
     if (BrowserWindow.getAllWindows().length === 0) {
-      createTray();
-      createWindow();
+      appReady();
     }
   });
-
-  function handleQuit() {
-    if (process.platform !== "darwin") {
-      app.quit();
-    }
-  }
-
   app.on("window-all-closed", function () {
     log.info("window-all-closed");
-    handleQuit();
+    if (!IS_MAC) app.quit();
   });
-
-  app.on("before-quit", (event) => {
+  app.on("before-quit", () => {
     log.info("before-quit");
     const windows = BrowserWindow.getAllWindows();
     windows.forEach((window) => window.destroy());
+  });
+  app.on("second-instance", (_, commandLine, __) => {
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.show();
+      mainWindow.focus();
+    }
+    openUrl(commandLine.pop().slice(0, -1));
+  });
+  app.on("open-url", (event, url) => {
+    log.info("open-url", url);
+    openUrl(url);
   });
 }
 
