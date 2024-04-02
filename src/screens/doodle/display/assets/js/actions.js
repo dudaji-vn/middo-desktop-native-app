@@ -3,7 +3,7 @@ let btnToggleDraw = document.querySelector(".toggle-draw");
 let btnToggleMic = document.querySelector(".toggle-mic");
 let btnToggleCamera = document.querySelector(".toggle-camera");
 let btnStopShare = document.querySelector(".stop-share");
-
+let isWaitingForLoadMedia = false;
 let canvas = document.querySelector("#draw");
 btnToggleDraw.addEventListener("click", () => {
   const isActive = btnToggleDraw.classList.contains("active");
@@ -21,16 +21,16 @@ btnToggleDraw.addEventListener("click", () => {
 });
 
 btnToggleMic.addEventListener("click", () => {
-  if (ipcRenderer) {
+  if (ipcRenderer && !isWaitingForLoadMedia) {
     ipcRenderer.send("TOGGLE_MIC");
-    btnToggleMic.classList.toggle("active");
+    isWaitingForLoadMedia = true;
   }
 });
 
 btnToggleCamera.addEventListener("click", () => {
-  if (ipcRenderer) {
+  if (ipcRenderer && !isWaitingForLoadMedia) {
     ipcRenderer.send("TOGGLE_CAMERA");
-    btnToggleCamera.classList.toggle("active");
+    isWaitingForLoadMedia = true;
   }
 });
 
@@ -54,5 +54,7 @@ if (ipcRenderer) {
     } else {
       btnToggleCamera.classList.remove("active");
     }
+
+    isWaitingForLoadMedia = false;
   });
 }
