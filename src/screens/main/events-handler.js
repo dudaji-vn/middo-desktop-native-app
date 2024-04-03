@@ -55,6 +55,9 @@ class EventHandler {
   notificationEvent() {
     ipcMain.on(EVENTS.SHOW_NOTIFICATION, (e, data) => {
       const isFocused = this.screen.isFocused();
+      if (myNotification) {
+        myNotification.close();
+      }
       let currentPathName = new URL(this.screen.webContents.getURL())?.pathname;
       const { title, body, url } = data;
       let notifyPathName = new URL(url)?.pathname;
