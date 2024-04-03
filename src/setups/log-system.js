@@ -4,7 +4,7 @@ class LogSystem {
 
   setup() {
     log.initialize();
-    log.transports.file.resolvePathFn = () => __dirname + "/log.log";
+    // log.transports.file.resolvePathFn = () => __dirname + "/log.log";
   }
 }
 
