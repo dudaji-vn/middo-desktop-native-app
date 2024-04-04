@@ -2,14 +2,10 @@
 const { app } = require("electron");
 const { IS_MAC } = require("../config");
 
-class StartUp {
-  constructor() {}
-
-  setup() {
-    if (!IS_MAC) {
-      if (require("electron-squirrel-startup")) app.quit();
-    }
+function setupStartUpApp() {
+  if (!IS_MAC) {
+    if (require("electron-squirrel-startup")) app.quit();
   }
 }
 
-module.exports = StartUp
+module.exports = setupStartUpApp

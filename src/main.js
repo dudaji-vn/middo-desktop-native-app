@@ -7,18 +7,18 @@ const { EVENTS } = require("./events");
 const { APP_URL, IS_MAC, APP_MODEL_ID } = require("./config");
 
 const globalEvents = require("./global-events");
+const setupLogSystem = require("./setups/log-system");
+const setupAutoUpdate = require("./setups/auto-update");
+const setupStartUpApp = require("./setups/start-up");
+const setupDeepLink = require("./setups/deep-link");
 const MainScreen = require("./screens/main");
-const DeepLink = require("./setups/deep-link");
-const StartUp = require("./setups/start-up");
-const AutoUpdate = require("./setups/auto-update");
-const LogSystem = require("./setups/log-system");
 const TrayIcon = require("./setups/tray-icon");
 
 app.setAppUserModelId(APP_MODEL_ID);
-new LogSystem().setup();
-new AutoUpdate().setup();
-new StartUp().setup();
-new DeepLink().setup();
+setupLogSystem();
+setupAutoUpdate();
+setupStartUpApp();
+setupDeepLink();
 
 const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) {
