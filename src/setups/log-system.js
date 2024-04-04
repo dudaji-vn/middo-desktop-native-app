@@ -1,11 +1,7 @@
 const log = require("electron-log");
-class LogSystem {
-  constructor() {}
 
-  setup() {
-    log.initialize();
-    log.transports.file.resolvePathFn = () => __dirname + "/log.log";
-  }
+function setupLogSystem() {
+  log.initialize();
 }
 
-module.exports = LogSystem;
+module.exports = setupLogSystem;
