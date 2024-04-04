@@ -49,6 +49,14 @@ class DoodleScreen {
     this.instance?.focus();
   }
 
+  destroy() {
+    this.eventHandler.destroyAllListener()
+    this.instance?.hide();
+    this.instance?.close();
+    this.instance?.destroy();
+    this.instance = null;
+  }
+
 }
 
 module.exports = DoodleScreen

@@ -8,20 +8,14 @@ class EventHandler {
     this.listenEvent();
   }
 
+  destroyAllListener() {
+    ipcMain.removeAllListeners(EVENTS.CALL_STATUS);
+    ipcMain.removeAllListeners(EVENTS.SEND_DOODLE_SHARE_SCREEN);
+    ipcMain.removeAllListeners(EVENTS.SET_IGNORE_MOUSE_EVENT);
+    ipcMain.removeAllListeners(EVENTS.CALL_STATUS);
+  }
+
   listenEvent() {
-    ipcMain.on(EVENTS.STOP_SHARE_SCREEN, () => {
-      if (this.screen) {
-        this.screen?.hide();
-        this.screen?.close();
-        this.screen?.destroy();
-        this.screen = null;
-        // remove all event
-        ipcMain.removeAllListeners(EVENTS.CALL_STATUS);
-        ipcMain.removeAllListeners(EVENTS.SEND_DOODLE_SHARE_SCREEN);
-        ipcMain.removeAllListeners(EVENTS.SET_IGNORE_MOUSE_EVENT);
-        ipcMain.removeAllListeners(EVENTS.CALL_STATUS);
-      }
-    });
 
     ipcMain.on(EVENTS.CALL_STATUS, (e, args) => {
       if (this.screen) {
