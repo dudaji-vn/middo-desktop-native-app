@@ -12,7 +12,7 @@ const setupAutoUpdate = require("./setups/auto-update");
 const setupStartUpApp = require("./setups/start-up");
 const setupDeepLink = require("./setups/deep-link");
 const MainScreen = require("./screens/main");
-const TrayIcon = require("./setups/tray-icon");
+const createTray = require("./setups/create-tray");
 
 app.setAppUserModelId(APP_MODEL_ID);
 setupLogSystem();
@@ -36,7 +36,7 @@ if (!gotTheLock) {
   function appReady() {
     log.info('App is ready');
     mainWindow = new MainScreen(APP_URL).instance
-    new TrayIcon(mainWindow)
+    createTray(mainWindow);
     setupPushReceiver(mainWindow.webContents);
     globalEvents();
     
