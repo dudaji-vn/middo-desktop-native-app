@@ -1,4 +1,6 @@
-const { contextBridge, ipcRenderer } = require("electron");
+const { contextBridge, ipcRenderer, shell } = require("electron");
+const { readFileSync } = require("fs");
+const { join } = require("path");
 const {
   START_NOTIFICATION_SERVICE,
   NOTIFICATION_SERVICE_STARTED,
@@ -14,6 +16,15 @@ contextBridge.exposeInMainWorld("electron", {
     ipcRenderer.once(channel, func);
     ipcRenderer.send("getFCMToken");
   },
+  openInBrowser: (url) => shell.openExternal(url),
+  getAppVersion: () => {
+    return ipcRenderer.sendSync("getAppVersion");
+  }
+});
+window.addEventListener("DOMContentLoaded", () => {
+  const rendererScript = document.createElement("script");
+  rendererScript.text = readFileSync(join(__dirname, "script.js"), "utf8");
+  document.body.appendChild(rendererScript);
 });
 
 contextBridge.exposeInMainWorld("ipcRenderer", {

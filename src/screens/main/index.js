@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require("electron");
+const { app, BrowserWindow, shell } = require("electron");
 const path = require('path')
 const { APP_TITLE, IS_MAC } = require("../../config");
 const EventHandler = require( "./events-handler");
@@ -23,6 +23,11 @@ class MainScreen {
     this.instance.on("focus", () => {
       this.handleFocus();
     });
+    // this.instance.on("new-window", function(event, url) {
+    //   console.log(url);
+    //   event.preventDefault();
+    //   shell.openExternal(url);
+    // });
     this.eventHandler = new EventHandler(this.instance)
   }
 
