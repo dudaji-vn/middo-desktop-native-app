@@ -7,4 +7,4 @@ function setupShortcut(mainWindow) {
     mainWindow.reload()
   })
 }
-module.exports = setupShorcut;
+module.exports = setupShortcut;
