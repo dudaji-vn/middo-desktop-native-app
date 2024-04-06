@@ -11,6 +11,7 @@ const setupLogSystem = require("./setups/log-system");
 const setupAutoUpdate = require("./setups/auto-update");
 const setupStartUpApp = require("./setups/start-up");
 const setupDeepLink = require("./setups/deep-link");
+const setupShortcut = require("./setups/shortcut");
 const MainScreen = require("./screens/main");
 const createTray = require("./setups/create-tray");
 
@@ -37,8 +38,9 @@ if (!gotTheLock) {
     mainWindow = new MainScreen(APP_URL).instance
     createTray(mainWindow);
     setupPushReceiver(mainWindow.webContents);
+    setupShortcut(mainWindow);
     globalEvents();
-    
+
   }
 
   app.on("ready", () => {
