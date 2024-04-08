@@ -7,6 +7,7 @@ function createTray(screen) {
     const icon = nativeImage.createFromPath(getParentPath(__dirname, 1) + "/assets/" + imageFileName);
     if (IS_MAC) icon.isMacTemplateImage = true;
     const tray = new Tray(icon);
+    tray.setIgnoreDoubleClickEvents(true);
     const contextMenu = Menu.buildFromTemplate([
       { label: "Open Middo", type: "normal", click: () => screen?.show() },
       {
