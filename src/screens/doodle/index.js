@@ -1,62 +1,45 @@
 const { BrowserWindow } = require("electron");
 const path = require('path')
+
 const { EVENTS } = require("../../events");
-const EventHandler = require("./events-handler");
 const { IS_MAC } = require("../../config");
-class DoodleScreen {
-  constructor(args) { // args is call status
-    this.instance = new BrowserWindow({
-      transparent: true,
-      frame: IS_MAC,
-      alwaysOnTop: true,
-      modal: true,
-      show: false,
-      roundedCorners: false,
-      fullscreen: true,
-      simpleFullscreen: true,
-      webPreferences: {
-        hardwareAcceleration: true,
-        contextIsolation: true,
-        nodeIntegration: true,
-        preload: path.join(__dirname, "preload.js"),
-      }
-    });
-    // this.instance.webContents.openDevTools({
-    //   mode: 'detach'
-    // });
-    this.instance.setIgnoreMouseEvents(true, { forward: true })
-    this.instance.loadFile(path.join(__dirname, "display", "index.html"))
-    this.instance.setPosition(0, 0); 
-    this.instance.maximize()
-    this.instance.show()
-    this.instance.webContents.on('did-finish-load', () => {
-      this.instance.webContents.send(EVENTS.CALL_STATUS, args);
-      this.instance.setFullScreen(true);
-    });
+const handleEvent = require("./events-handler");
 
-    this.eventHandler = new EventHandler(this.instance)
-  }
-
-  show() {
-    this.instance?.show();
-  }
-
-  hide() {
-    this.instance?.hide();
-  }
-
-  focus() {
-    this.instance?.focus();
-  }
-
-  destroy() {
-    this.eventHandler.destroyAllListener()
-    this.instance?.hide();
-    this.instance?.close();
-    this.instance?.destroy();
-    this.instance = null;
-  }
-
+function createDooleScreen(args) {
+  const screen = new BrowserWindow({
+    transparent: true,
+    frame: IS_MAC,
+    alwaysOnTop: true,
+    modal: true,
+    show: false,
+    roundedCorners: false,
+    fullscreen: true,
+    simpleFullscreen: true,
+    // frame: true,
+    // autoHideMenuBar: true,
+    // skipTaskbar: true,
+    hasShadow: false,
+    webPreferences: {
+      hardwareAcceleration: true,
+      contextIsolation: true,
+      nodeIntegration: true,
+      preload: path.join(__dirname, "preload.js"),
+    }
+  });
+  screen.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true, skipTransformProcessType: true});
+  screen.setIgnoreMouseEvents(true, { forward: true })
+  screen.loadFile(path.join(__dirname, "display", "index.html"))
+  screen.setPosition(0, 0); 
+  screen.maximize()
+  screen.show()
+  let level = 'normal';
+  if (process.platform === 'darwin')level = 'floating';
+  screen.setAlwaysOnTop(true, level);
+  screen.webContents.on('did-finish-load', () => {
+    screen.webContents.send(EVENTS.CALL_STATUS, args);
+    screen.setFullScreen(true);
+  });
+  handleEvent(screen)
 }
 
-module.exports = DoodleScreen
+module.exports = createDooleScreen

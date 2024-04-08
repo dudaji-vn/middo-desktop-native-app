@@ -60,3 +60,13 @@ ipcRenderer.on(NOTIFICATION_RECEIVED, (_, serverNotificationPayload) => {
 
 // Start service
 ipcRenderer.send(START_NOTIFICATION_SERVICE, SENDER_ID)
+
+
+// 
+const updateOnlineStatus = () => {
+  if (ipcRenderer)
+    ipcRenderer.send("NETWORK_STATUS", navigator.onLine ? "online" : "offline");
+};
+window.addEventListener("online", updateOnlineStatus);
+window.addEventListener("offline", updateOnlineStatus);
+updateOnlineStatus();
