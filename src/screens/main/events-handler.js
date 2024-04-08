@@ -7,6 +7,7 @@ const {
   desktopCapturer,
   Notification,
 } = require("electron");
+const log = require("electron-log");
 const { APP_URL, IS_MAC } = require("../../config");
 const { EVENTS } = require("../../events");
 const getParentPath = require("../../utils/get-parent-path");
@@ -57,6 +58,7 @@ function handleEvent(screen) {
     if (myNotification) {
       myNotification.close();
     }
+    log.info("Got notification", data);
     let currentPathName = new URL(screen.webContents.getURL())?.pathname;
     const { title, body, url } = data;
     let notifyPathName = new URL(url)?.pathname;
@@ -78,9 +80,9 @@ function handleEvent(screen) {
       title,
       body,
       icon: getParentPath(__dirname, 2) + "/assets/icon.png",
-      silent: false,
-      timeoutType: "default",
-      urgency: "normal",
+      // silent: false,
+      // timeoutType: "default",
+      // urgency: "normal",
     });
     myNotification.on("click", () => {
       screen.webContents.send("OPEN_URL", url);
