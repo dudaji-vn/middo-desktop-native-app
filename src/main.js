@@ -76,9 +76,13 @@ if (!gotTheLock) {
     setupPushReceiver(mainWindow.webContents);
     setupShortcut(mainWindow);
     globalEvents();
-
+    // mainWindow.webContents.openDevTools();
   }
-
+  
+  app.on("browser-window-focus", () => {
+    log.info("browser-window-focus");
+    mainWindow.webContents.send(EVENTS.WINDOW_FOCUSED, {});
+  });
   app.on("ready", () => appReady());
   app.on("activate", () => {
     if (mainWindow) {
