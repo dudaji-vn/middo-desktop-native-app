@@ -1,56 +1,43 @@
-const { app, BrowserWindow, shell } = require("electron");
-const path = require('path')
+const { app, BrowserWindow } = require("electron");
+const path = require("path");
+
+const handleEvent = require("./events-handler");
 const { APP_TITLE, IS_MAC } = require("../../config");
-const EventHandler = require( "./events-handler");
-class MainScreen {
-  constructor(loadUrl) {
-    this.instance = new BrowserWindow({
-      title: APP_TITLE,
-      icon: "../../assets/icon.ico",
-      webPreferences: {
-        contextIsolation: true,
-        nodeIntegration: true,
-        preload: path.join(__dirname, "preload.js"),
-      },
-    });
-    this.instance.setMenu(null);
-    this.instance.maximize();
-    this.instance.loadURL(loadUrl);
-    this.instance.on("close", (event) => {
-      event.preventDefault();
-      this.hide();
-    });
-    this.instance.on("focus", () => {
-      this.handleFocus();
-    });
-    // this.instance.on("new-window", function(event, url) {
-    //   console.log(url);
-    //   event.preventDefault();
-    //   shell.openExternal(url);
-    // });
-    this.eventHandler = new EventHandler(this.instance)
+
+function createMainScreen(loadUrl, isOnline = false) {
+  let screen = new BrowserWindow({
+    title: APP_TITLE,
+    icon: "../../assets/icon.ico",
+    minWidth: 400,
+    minHeight: 500,
+    webPreferences: {
+      contextIsolation: true,
+      nodeIntegration: true,
+      preload: path.join(__dirname, "preload.js"),
+    },
+  });
+  screen.setMenu(null);
+  screen.maximize();
+
+  if(isOnline) {
+    screen.loadURL(loadUrl);
+  } else {
+    screen.loadFile(path.join(__dirname, "error", "index.html"));
   }
 
-  show() {
-    this.instance?.show();
-  }
-
-  hide() {
-    this.instance?.hide();
-  }
-
-  focus() {
-    this.instance?.focus();
-  }
-
-  handleFocus() {
-    if(IS_MAC) {
+  screen.on("close", (event) => {
+    event.preventDefault();
+    screen.hide();
+  });
+  screen.on("focus", () => {
+    if (IS_MAC) {
       app?.dock?.setBadge("");
     } else {
-      this.instance.setOverlayIcon(null, '')
+      screen.setOverlayIcon(null, "");
     }
-  }
+  });
+  handleEvent(screen)
 
+  return screen;
 }
-
-module.exports = MainScreen
+module.exports = createMainScreen;
