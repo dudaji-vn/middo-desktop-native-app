@@ -12,6 +12,7 @@ const { APP_URL, IS_MAC } = require("../../config");
 const { EVENTS } = require("../../events");
 const getParentPath = require("../../utils/get-parent-path");
 let myNotification;
+let notifications = [];
 function handleEvent(screen) {
   ipcMain.on(EVENTS.GOOGLE_LOGIN, (_) => {
     shell.openExternal(APP_URL + "/login-google-electron");
@@ -40,7 +41,6 @@ function handleEvent(screen) {
     e.sender.send(EVENTS.GET_SCREEN_SOURCE, sources);
   });
 
-  
   // Event for drag able bar
   ipcMain.on(EVENTS.TOGGLE_MIC, () => {
     screen.webContents.send(EVENTS.TOGGLE_MIC);
@@ -54,15 +54,39 @@ function handleEvent(screen) {
 
   // NOTIFICATION
   ipcMain.on(EVENTS.SHOW_NOTIFICATION, (e, data) => {
+    let isShow = notifications.length === 0;
+    console.log({lenght: notifications.length, isShow})
+    notifications.push(data);
+    if(isShow) {
+      showNotification();
+    }
+  });
+
+  function showNotification() {
+    if(!notifications.length) return;
     const isFocused = screen.isFocused();
+    const data = notifications[0];
+    const { title, body, url } = data;
+    
     if (myNotification) {
       myNotification.close();
+      myNotification.removeAllListeners();
+      myNotification = null;
     }
-    log.info("Got notification", data);
+    
     let currentPathName = new URL(screen.webContents.getURL())?.pathname;
-    const { title, body, url } = data;
     let notifyPathName = new URL(url)?.pathname;
-    if (currentPathName == notifyPathName && isFocused) return;
+    log.info("Got notification::", {
+      body: data.body, currentPathName, notifyPathName, isFocused
+    });
+    if (currentPathName == notifyPathName && isFocused) {
+      notifications.shift();
+      notifications = notifications.filter((item) => {
+        return new URL(item.url)?.pathname !== currentPathName;
+      });
+      showNotification()
+      return;
+    };
     if (!isFocused) {
       if (IS_MAC) {
         app?.dock?.bounce();
@@ -89,8 +113,24 @@ function handleEvent(screen) {
       screen.show();
       screen.focus();
       myNotification.close();
+      notifications.shift();
+      showNotification();
     });
+    myNotification.on("close", () => {
+      notifications.shift();
+      showNotification();
+    });
+  
     myNotification.show();
+  }
+
+  screen.webContents.on("did-navigate-in-page", (e, url) => {
+    let pathName = new URL(url)?.pathname;
+    notifications = notifications.filter((item) => {
+      return new URL(item.url)?.pathname !== pathName;
+    });
   });
 }
+
+
 module.exports = handleEvent;
