@@ -32,19 +32,21 @@ if (!gotTheLock) {
     if (!urlStr) return;
     const urlParse = url.parse(urlStr, true);
     const {query, pathname, host} = urlParse;
-    if(pathname) {
+    if(pathname && pathname !== "/") {
       if (!mainWindow) {
         app.on("ready", () => {
           openUrl(urlStr);
         });
         return;
       }
+      log.info("open inside url", host + pathname);
       mainWindow.webContents.send("OPEN_URL", host + pathname);
       mainWindow.show();
       mainWindow.focus();
       return;
     }
     const { token, refresh_token } = query;
+    log.info("login google", { token, refresh_token });
     mainWindow.webContents.send(EVENTS.GOOGLE_LOGIN_SUCCESS, {
       token,
       refresh_token,
