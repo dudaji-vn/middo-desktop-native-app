@@ -55,7 +55,6 @@ function handleEvent(screen) {
   // NOTIFICATION
   ipcMain.on(EVENTS.SHOW_NOTIFICATION, (e, data) => {
     let isShow = notifications.length === 0;
-    console.log({lenght: notifications.length, isShow})
     notifications.push(data);
     if(isShow) {
       showNotification();
@@ -68,11 +67,11 @@ function handleEvent(screen) {
     const data = notifications[0];
     const { title, body, url } = data;
     
-    if (myNotification) {
-      myNotification.close();
-      myNotification.removeAllListeners();
-      myNotification = null;
-    }
+    // if (myNotification) {
+    //   myNotification.close();
+    //   myNotification.removeAllListeners();
+    //   myNotification = null;
+    // }
     
     let currentPathName = new URL(screen.webContents.getURL())?.pathname;
     let notifyPathName = new URL(url)?.pathname;

@@ -27,6 +27,7 @@ function createMainScreen(loadUrl, isOnline = false) {
 
   screen.on("close", (event) => {
     event.preventDefault();
+    screen.reload();
     screen.hide();
   });
   screen.on("focus", () => {
