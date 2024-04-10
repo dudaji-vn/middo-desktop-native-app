@@ -25,11 +25,6 @@ function createMainScreen(loadUrl, isOnline = false) {
     screen.loadFile(path.join(__dirname, "error", "index.html"));
   }
 
-  screen.on("close", (event) => {
-    event.preventDefault();
-    screen.reload();
-    screen.hide();
-  });
   screen.on("focus", () => {
     if (IS_MAC) {
       app?.dock?.setBadge("");

@@ -11,8 +11,10 @@ const log = require("electron-log");
 const { APP_URL, IS_MAC } = require("../../config");
 const { EVENTS } = require("../../events");
 const getParentPath = require("../../utils/get-parent-path");
+const createDooleScreen = require("../doodle");
 let myNotification;
 let notifications = [];
+let doodleScreen = null;
 function handleEvent(screen) {
   ipcMain.on(EVENTS.GOOGLE_LOGIN, (_) => {
     shell.openExternal(APP_URL + "/login-google-electron");
@@ -50,6 +52,27 @@ function handleEvent(screen) {
   });
   ipcMain.on(EVENTS.STOP_SHARE, () => {
     screen.webContents.send(EVENTS.STOP_SHARE);
+  });
+
+  screen.on("close", (event) => {
+    event.preventDefault();
+    screen.reload();
+    screen.hide();
+    if(doodleScreen) {
+      doodleScreen?.hide();
+      doodleScreen?.close();
+      doodleScreen?.destroy();
+      doodleScreen = null;
+      ipcMain.removeAllListeners(EVENTS.CALL_STATUS);
+      ipcMain.removeAllListeners(EVENTS.SEND_DOODLE_SHARE_SCREEN);
+      ipcMain.removeAllListeners(EVENTS.SET_IGNORE_MOUSE_EVENT);
+      ipcMain.removeAllListeners(EVENTS.STOP_SHARE_SCREEN);
+    }
+  });
+
+  // Event doodle
+  ipcMain.on(EVENTS.SHARE_SCREEN_SUCCESS, (e, args) => {
+    doodleScreen = createDooleScreen(args)
   });
 
   // NOTIFICATION
