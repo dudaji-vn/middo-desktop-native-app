@@ -21,6 +21,8 @@ setupLogSystem();
 setupAutoUpdate();
 setupStartUpApp();
 setupDeepLink();
+
+
 const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) {
   app.quit();
@@ -53,27 +55,8 @@ if (!gotTheLock) {
     });
   }
   
-  function changePage(internetStatus) {
-    if (internetStatus === "offline") {
-      currentURL = mainWindow.webContents.getURL()
-      mainWindow.loadFile(path.join(__dirname, "screens", "main", "error", "index.html"))
-    } else if(internetStatus === "online") {
-      mainWindow.loadURL(currentURL || APP_URL)
-    }
-  }
-
   function appReady() {
-    let isOnline = net.isOnline();
-    mainWindow = createMainScreen(APP_URL, isOnline)
-    ipcMain.on(EVENTS.NETWORK_STATUS, (_, status) => {
-      if (isOnline && status === "offline") {
-        isOnline = false
-        changePage(status)
-      } else if(!isOnline && status === "online") {
-        isOnline = true
-        changePage(status)
-      }
-    });
+    mainWindow = createMainScreen(APP_URL)
     createTray(mainWindow);
     setupPushReceiver(mainWindow.webContents);
     setupShortcut(mainWindow);

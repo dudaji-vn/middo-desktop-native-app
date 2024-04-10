@@ -1,10 +1,12 @@
-const { app, BrowserWindow } = require("electron");
+const { app, BrowserWindow, net } = require("electron");
 const path = require("path");
 
 const handleEvent = require("./events-handler");
 const { APP_TITLE, IS_MAC } = require("../../config");
+const handleNotification = require("./features/notification");
 
-function createMainScreen(loadUrl, isOnline = false) {
+function createMainScreen(loadUrl) {
+  let isOnline = net.isOnline();
   let screen = new BrowserWindow({
     title: APP_TITLE,
     icon: "../../assets/icon.ico",
@@ -18,7 +20,6 @@ function createMainScreen(loadUrl, isOnline = false) {
   });
   screen.setMenu(null);
   screen.maximize();
-
   if(isOnline) {
     screen.loadURL(loadUrl);
   } else {
@@ -32,8 +33,9 @@ function createMainScreen(loadUrl, isOnline = false) {
       screen.setOverlayIcon(null, "");
     }
   });
-  handleEvent(screen)
 
+  handleEvent(screen)
+  handleNotification(screen)
   return screen;
 }
 module.exports = createMainScreen;
