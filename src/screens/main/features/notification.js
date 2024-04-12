@@ -1,4 +1,4 @@
-const { app, ipcMain, Notification } = require('electron');
+const { app, ipcMain, Notification, nativeImage } = require('electron');
 const log = require('electron-log');
 const getParentPath = require('../../../utils/get-parent-path');
 const { EVENTS } = require('../../../events');
@@ -14,11 +14,11 @@ function handleNotification(screen) {
     const data = notifications[0];
     const { title, body, url } = data;
     if(timer) clearTimeout(timer)
-    // if (myNotification) {
-    //   myNotification.close();
-    //   myNotification.removeAllListeners();
-    //   myNotification = null;
-    // }
+    if (myNotification) {
+      myNotification.close();
+      // myNotification.removeAllListeners();
+      // myNotification = null;
+    }
 
     let currentPathName = new URL(screen.webContents.getURL())?.pathname;
     let notifyPathName = new URL(url)?.pathname;
@@ -71,7 +71,9 @@ function handleNotification(screen) {
 
     // on show event
     myNotification.on('show', () => {
-      notifications.shift();
+      setTimeout(()=> {
+        notifications.shift();
+      }, 100)
       timer = setTimeout(()=>{
         showNotification()
       }, 5000)
