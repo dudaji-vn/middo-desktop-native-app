@@ -5,17 +5,20 @@ const { EVENTS } = require('../../../events');
 const { IS_MAC } = require('../../../config');
 let notifications = [];
 let myNotification = null;
+let timer = null;
+
 function handleNotification(screen) {
   function showNotification() {
     if (!notifications.length) return;
     const isFocused = screen.isFocused();
     const data = notifications[0];
     const { title, body, url } = data;
-    if (myNotification) {
-      myNotification.close();
-      myNotification.removeAllListeners();
-      myNotification = null;
-    }
+    if(timer) clearTimeout(timer)
+    // if (myNotification) {
+    //   myNotification.close();
+    //   myNotification.removeAllListeners();
+    //   myNotification = null;
+    // }
 
     let currentPathName = new URL(screen.webContents.getURL())?.pathname;
     let notifyPathName = new URL(url)?.pathname;
@@ -25,8 +28,8 @@ function handleNotification(screen) {
       notifyPathName,
       isFocused,
     });
+    
     if (currentPathName == notifyPathName && isFocused) {
-      notifications.shift();
       notifications = notifications.filter((item) => {
         return new URL(item.url)?.pathname !== currentPathName;
       });
@@ -59,20 +62,26 @@ function handleNotification(screen) {
       screen.show();
       screen.focus();
       myNotification.close();
-      notifications.shift();
       showNotification();
     });
     myNotification.on("close", () => {
     log.info('close event')
-      notifications.shift();
       showNotification();
     });
 
+    // on show event
+    myNotification.on('show', () => {
+      notifications.shift();
+      timer = setTimeout(()=>{
+        showNotification()
+      }, 5000)
+    })
     myNotification.show();
   }
 
   ipcMain.on(EVENTS.SHOW_NOTIFICATION, (e, data) => {
     let isShow = notifications.length === 0;
+    console.log({length: notifications.length, isShow})
     notifications.push(data);
     if (isShow) {
       showNotification();
