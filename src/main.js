@@ -34,6 +34,10 @@ if (!gotTheLock) {
     if (!urlStr) return;
     const urlParse = url.parse(urlStr, true);
     const {query, pathname, host} = urlParse;
+    if(mainWindow) {
+      mainWindow.show();
+      mainWindow.focus();
+    }
     if(pathname && pathname !== "/") {
       if (!mainWindow) {
         app.on("ready", () => {

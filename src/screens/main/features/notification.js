@@ -15,7 +15,7 @@ function handleNotification(screen) {
     const { title, body, url } = data;
     if(timer) clearTimeout(timer)
     if (myNotification) {
-      myNotification.close();
+      if(!IS_MAC) myNotification.close();
       // myNotification.removeAllListeners();
       // myNotification = null;
     }

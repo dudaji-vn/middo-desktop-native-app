@@ -16,7 +16,7 @@ function createMainScreen(loadUrl) {
       contextIsolation: true,
       nodeIntegration: true,
       preload: path.join(__dirname, "preload.js"),
-    },
+    }
   });
   screen.setMenu(null);
   screen.maximize();
