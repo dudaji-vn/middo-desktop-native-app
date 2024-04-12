@@ -83,7 +83,7 @@ function handleNotification(screen) {
 
   ipcMain.on(EVENTS.SHOW_NOTIFICATION, (e, data) => {
     let isShow = notifications.length === 0;
-    console.log({length: notifications.length, isShow})
+    log.info({length: notifications.length, isShow})
     notifications.push(data);
     if (isShow) {
       showNotification();
