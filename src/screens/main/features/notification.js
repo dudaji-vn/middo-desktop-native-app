@@ -13,6 +13,8 @@ function handleNotification(screen) {
     const isFocused = screen.isFocused();
     const data = notifications[0];
     const { title, body, url } = data;
+
+    // Clear previous notification
     if(timer) clearTimeout(timer)
     if (myNotification) {
       if(!IS_MAC) myNotification.close();
@@ -22,13 +24,14 @@ function handleNotification(screen) {
 
     let currentPathName = new URL(screen.webContents.getURL())?.pathname;
     let notifyPathName = new URL(url)?.pathname;
-    log.info("Got notification::", {
-      body: data.body,
-      currentPathName,
-      notifyPathName,
-      isFocused,
-    });
-    
+    // log.info("Got notification::", {
+    //   body: data.body,
+    //   currentPathName,
+    //   notifyPathName,
+    //   isFocused,
+    // });
+
+    // Check if current page is notification page
     if (currentPathName == notifyPathName && isFocused) {
       notifications = notifications.filter((item) => {
         return new URL(item.url)?.pathname !== currentPathName;
@@ -36,6 +39,8 @@ function handleNotification(screen) {
       showNotification();
       return;
     }
+
+    // Check if app is focused to show badge or bounce
     if (!isFocused) {
       if (IS_MAC) {
         app?.dock?.bounce();
@@ -49,6 +54,8 @@ function handleNotification(screen) {
         );
       }
     }
+
+    // Create notification
     myNotification = new Notification({
       title,
       body,
@@ -81,7 +88,16 @@ function handleNotification(screen) {
     myNotification.show();
   }
 
-  ipcMain.on(EVENTS.SHOW_NOTIFICATION, (e, data) => {
+  ipcMain.on(EVENTS.SHOW_NOTIFICATION, async (_, data) => {
+    // wait for screen to be ready
+    while (!screen) {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+    screen.webContents.send("CHECK_SEEN_NOTIFICATION", data);
+    
+  });
+
+  ipcMain.on(EVENTS.NOTIFICATION_NOT_SEEN, (_ , data) => {
     let isShow = notifications.length === 0;
     log.info({length: notifications.length, isShow})
     notifications.push(data);
