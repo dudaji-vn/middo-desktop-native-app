@@ -1,5 +1,6 @@
 const { updateElectronApp } = require("update-electron-app");
 const log = require("electron-log");
+const { IS_MAC } = require("../config");
 
 function setupAutoUpdate() {
   updateElectronApp({
@@ -17,6 +18,7 @@ function setupAutoUpdate() {
         log.log(msg);
       },
     },
+    notifyUser: !IS_MAC,
   });
 }
 module.exports = setupAutoUpdate;
