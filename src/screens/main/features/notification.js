@@ -59,7 +59,7 @@ function handleNotification(screen) {
     myNotification = new Notification({
       title,
       body,
-      icon: getParentPath(__dirname, 3) + "/assets/icon.png",
+      icon: IS_MAC ? undefined :getParentPath(__dirname, 3) + "/assets/icon.png",
       hasReply: true,
       replyPlaceholder: "Type your message here",
       // silent: false,
@@ -75,6 +75,8 @@ function handleNotification(screen) {
       myNotification.close();
       showNotification();
     });
+
+    // actions
 
     myNotification.on("click", () => {
       screen.webContents.send("OPEN_URL", url);
