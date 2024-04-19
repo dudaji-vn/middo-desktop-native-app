@@ -60,10 +60,22 @@ function handleNotification(screen) {
       title,
       body,
       icon: getParentPath(__dirname, 3) + "/assets/icon.png",
+      hasReply: true,
+      replyPlaceholder: "Type your message here",
       // silent: false,
       // timeoutType: "default",
       // urgency: "normal",
     });
+    myNotification.on("reply", (_, message) => {
+      if(!message.trim()) return;
+      screen.webContents.send(EVENTS.REPLY_NOTIFICATION, {
+        message,
+        url,
+      });
+      myNotification.close();
+      showNotification();
+    });
+
     myNotification.on("click", () => {
       screen.webContents.send("OPEN_URL", url);
       screen.show();
@@ -72,7 +84,7 @@ function handleNotification(screen) {
       showNotification();
     });
     myNotification.on("close", () => {
-    log.info('close event')
+      log.info('close event')
       showNotification();
     });
 
