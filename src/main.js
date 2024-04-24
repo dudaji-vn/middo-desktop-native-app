@@ -29,37 +29,46 @@ if (!gotTheLock) {
 } else {
   let mainWindow;
   function openUrl(urlStr) {
-    if (!urlStr) return;
-    log.info("open-url", urlStr);
-    const urlParse = url.parse(urlStr, true);
-    const dataEncode = urlParse.query?.data;
-    if(!dataEncode) return;
-    const dataString = decodeURIComponent(dataEncode);
-    if(!dataString) return;
-    const data = JSON.parse(dataString);
-    if(!data || !data?.type || !data.data) return;
-    if(mainWindow) {
-      mainWindow.show();
-      mainWindow.focus();
-    }
-    switch(data.type) {
-      case "google-login":
-        const { token, refresh_token } = data.data;
-        if(!token || !refresh_token) return;
-        log.info("login google", { token, refresh_token });
-        mainWindow.webContents.send(EVENTS.GOOGLE_LOGIN_SUCCESS, {
-          token,
-          refresh_token,
-        });
-        break;
-      case 'redirect': // This for click custom link in notification
-        const { url } = data.data;
-        if(!url) return;
-        log.info("open inside url", url);
-        mainWindow.webContents.send("OPEN_URL", url);
-        break;
-      default:
-        break;
+    try {
+      if (!urlStr) return;
+      log.info("open-url", urlStr);
+      const urlParse = url.parse(urlStr, true);
+      let dataEncode = urlParse.query?.data;
+      if(!dataEncode) return;
+      // remove %7 from end of dataEncode if have by } character
+      if(dataEncode.endsWith("%7")) {
+        dataEncode = dataEncode.slice(0, -2);
+        dataEncode += "}";
+      }
+      const dataString = decodeURIComponent(dataEncode);
+      if(!dataString) return;
+      const data = JSON.parse(dataString);
+      if(!data || !data?.type || !data.data) return;
+      if(mainWindow) {
+        mainWindow.show();
+        mainWindow.focus();
+      }
+      switch(data.type) {
+        case "google-login":
+          const { token, refresh_token } = data.data;
+          if(!token || !refresh_token) return;
+          log.info("login google", { token, refresh_token });
+          mainWindow.webContents.send(EVENTS.GOOGLE_LOGIN_SUCCESS, {
+            token,
+            refresh_token,
+          });
+          break;
+        case 'redirect': // This for click custom link in notification
+          const { url } = data.data;
+          if(!url) return;
+          log.info("open inside url", url);
+          mainWindow.webContents.send("OPEN_URL", url);
+          break;
+        default:
+          break;
+      }
+    } catch (error) {
+      log.error(error);
     }
   }
   

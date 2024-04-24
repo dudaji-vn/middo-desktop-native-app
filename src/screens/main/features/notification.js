@@ -56,36 +56,39 @@ function handleNotification(screen) {
     }
 
     // Create notification
-    const toastXml = `
-      <toast>
-        <visual>
-          <binding template="ToastGeneric">
+    const dataObj = {
+      type: 'redirect',
+      data: { url },
+    }
+    const dataUrl = encodeURIComponent(JSON.stringify(dataObj));
+    const toastXml = ` 
+    <toast launch="middo://?data=${dataUrl}" activationType="protocol">
+    <visual>
+        <binding template="ToastGeneric">
+            <image placement='appLogoOverride' src='${getParentPath(__dirname, 3) + "/assets/icon.png"}'/>
             <text>${title}</text>
-            <text>${body}</text>
-          </binding>
-        </visual>
-        <actions>
-          <input id="reply" type="text" placeHolderContent="Type your message here" />
-          <action
-            content="Reply"
-            arguments="reply"
-            activationType="background"
-            hint-inputId="reply"
-          />
-        </actions>
-      </toast>
-    `;
+            <text placement="attribution">${body}</text>
+        </binding>
+    </visual>
+    <actions>
+      <input id="textBox" type="text" placeHolderContent="Type a reply"/>
+      <action
+        content="Send"
+        arguments="action=reply&amp;convId=9318"
+        hint-inputId="textBox"/>
+    </actions>
+    </toast>`;
 
     myNotification = new Notification({
       title,
       body,
-      icon: IS_MAC ? undefined :getParentPath(__dirname, 3) + "/assets/icon.png",
+      icon: IS_MAC ? undefined : getParentPath(__dirname, 3) + "/assets/icon.png",
       hasReply: true,
       replyPlaceholder: "Type your message here",
       // silent: false,
       // timeoutType: "default",
       // urgency: "normal",
-      toastXml: toastXml,
+      // toastXml: toastXml,
     });
     myNotification.on("reply", (_, message) => {
       if(!message.trim()) return;
@@ -100,10 +103,14 @@ function handleNotification(screen) {
     // actions
 
     myNotification.on("click", () => {
+      log.info('click event')
       screen.webContents.send("OPEN_URL", url);
       screen.show();
       screen.focus();
       myNotification.close();
+      notifications = notifications.filter((item) => {
+        return new URL(item.url)?.pathname !== currentPathName;
+      });
       showNotification();
     });
     myNotification.on("close", () => {
