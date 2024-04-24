@@ -1,6 +1,6 @@
 class Doodle {
   constructor() {
-    this.doodle = [];
+    this.doodle = new WeakMap();
     this.init();
   }
 
@@ -14,23 +14,16 @@ class Doodle {
 
   handleSendDoodleShareScreen(data) {
     const { image, user } = data;
-    const index = this.doodle.findIndex((d) => d?.user?._id === user?._id);
-    if (index !== -1) {
-      this.doodle[index].image = image;
+    if (this.doodle.has(user)) {
+      this.doodle.set(user, { image, user });
     } else {
-      this.doodle.push({ image, user });
+      this.doodle.set(user, { image, user });
     }
     this.updateImageList({ image, user });
   }
 
   updateImageList({ image, user }) {
     let oldImage = document.querySelector(`[data-id="${user._id}"]`);
-    const index = this.doodle.findIndex((d) => d.user._id === user._id);
-    if (index && this.doodle[index].timer) {
-      clearTimeout(this.doodle[index].timer);
-    }
-    // if(image == this.doodle[index].image) return;
-
     if (oldImage) {
       oldImage.src = image;
     } else {
@@ -50,9 +43,10 @@ class Doodle {
       if (oldImage) {
         oldImage.remove();
       }
+      this.doodle.delete(user);
     }, 20000);
 
-    this.doodle[index].timer = timer;
+    this.doodle.set(user, { image, user, timer });
   }
 
   init() {
