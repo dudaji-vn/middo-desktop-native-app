@@ -56,6 +56,26 @@ function handleNotification(screen) {
     }
 
     // Create notification
+    const toastXml = `
+      <toast>
+        <visual>
+          <binding template="ToastGeneric">
+            <text>${title}</text>
+            <text>${body}</text>
+          </binding>
+        </visual>
+        <actions>
+          <input id="reply" type="text" placeHolderContent="Type your message here" />
+          <action
+            content="Reply"
+            arguments="reply"
+            activationType="background"
+            hint-inputId="reply"
+          />
+        </actions>
+      </toast>
+    `;
+
     myNotification = new Notification({
       title,
       body,
@@ -65,6 +85,7 @@ function handleNotification(screen) {
       // silent: false,
       // timeoutType: "default",
       // urgency: "normal",
+      toastXml: toastXml,
     });
     myNotification.on("reply", (_, message) => {
       if(!message.trim()) return;
