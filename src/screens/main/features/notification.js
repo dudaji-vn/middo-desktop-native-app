@@ -66,7 +66,7 @@ function handleNotification(screen) {
     <toast launch="middo://?data=${dataUrl}" activationType="protocol">
     <visual>
         <binding template="ToastGeneric">
-            <image placement='appLogoOverride' src='${path.join(__dirname, 'images', 'icon.ico')}'/>
+            <image placement='appLogoOverride' src='${ getParentPath(__dirname, 3) + "/assets/icon.png"}'/>
             <text>${title}</text>
             <text placement="attribution">${body}</text>
         </binding>
@@ -76,7 +76,7 @@ function handleNotification(screen) {
     myNotification = new Notification({
       title,
       body,
-      icon: IS_MAC ? undefined : path.join(__dirname, 'images', 'icon.ico'),
+      icon: IS_MAC ? undefined :  getParentPath(__dirname, 3) + "/assets/icon.png",
       hasReply: true,
       replyPlaceholder: "Type your message here",
       // silent: false,
