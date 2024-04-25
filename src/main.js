@@ -45,8 +45,10 @@ if (!gotTheLock) {
       const data = JSON.parse(dataString);
       if(!data || !data?.type || !data.data) return;
       if(mainWindow) {
+        mainWindow.setAlwaysOnTop(true);
         mainWindow.show();
-        mainWindow.focus();
+        mainWindow.setAlwaysOnTop(false);
+        app.focus();
       }
       switch(data.type) {
         case "google-login":

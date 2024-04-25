@@ -1,5 +1,6 @@
 const { app, ipcMain, Notification, nativeImage } = require('electron');
 const log = require('electron-log');
+const path = require('path');
 const getParentPath = require('../../../utils/get-parent-path');
 const { EVENTS } = require('../../../events');
 const { IS_MAC } = require('../../../config');
@@ -65,30 +66,23 @@ function handleNotification(screen) {
     <toast launch="middo://?data=${dataUrl}" activationType="protocol">
     <visual>
         <binding template="ToastGeneric">
-            <image placement='appLogoOverride' src='${getParentPath(__dirname, 3) + "/assets/icon.png"}'/>
+            <image placement='appLogoOverride' src='${path.join(__dirname, 'icon.ico')}'/>
             <text>${title}</text>
             <text placement="attribution">${body}</text>
         </binding>
     </visual>
-    <actions>
-      <input id="textBox" type="text" placeHolderContent="Type a reply"/>
-      <action
-        content="Send"
-        arguments="action=reply&amp;convId=9318"
-        hint-inputId="textBox"/>
-    </actions>
     </toast>`;
 
     myNotification = new Notification({
       title,
       body,
-      icon: IS_MAC ? undefined : getParentPath(__dirname, 3) + "/assets/icon.png",
+      icon: IS_MAC ? undefined : path.join(__dirname, 'icon.ico'),
       hasReply: true,
       replyPlaceholder: "Type your message here",
       // silent: false,
       // timeoutType: "default",
       // urgency: "normal",
-      // toastXml: toastXml,
+      toastXml: toastXml,
     });
     myNotification.on("reply", (_, message) => {
       if(!message.trim()) return;
