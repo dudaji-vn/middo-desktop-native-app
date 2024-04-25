@@ -82,7 +82,7 @@ function handleNotification(screen) {
       // silent: false,
       // timeoutType: "default",
       // urgency: "normal",
-      toastXml: toastXml,
+      // toastXml: toastXml,
     });
     myNotification.on("reply", (_, message) => {
       if(!message.trim()) return;
