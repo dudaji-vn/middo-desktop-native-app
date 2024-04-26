@@ -1,5 +1,6 @@
 const { app, ipcMain, Notification, nativeImage } = require('electron');
 const log = require('electron-log');
+const path = require('path');
 const getParentPath = require('../../../utils/get-parent-path');
 const { EVENTS } = require('../../../events');
 const { IS_MAC } = require('../../../config');
@@ -56,15 +57,32 @@ function handleNotification(screen) {
     }
 
     // Create notification
+    const dataObj = {
+      type: 'redirect',
+      data: { url },
+    }
+    const dataUrl = encodeURIComponent(JSON.stringify(dataObj));
+    const toastXml = ` 
+    <toast launch="middo://?data=${dataUrl}" activationType="protocol">
+    <visual>
+        <binding template="ToastGeneric">
+            <image placement='appLogoOverride' src='${ getParentPath(__dirname, 3) + "/assets/icon.png"}'/>
+            <text>${title}</text>
+            <text placement="attribution">${body}</text>
+        </binding>
+    </visual>
+    </toast>`;
+
     myNotification = new Notification({
       title,
       body,
-      icon: IS_MAC ? undefined :getParentPath(__dirname, 3) + "/assets/icon.png",
+      icon: IS_MAC ? undefined :  getParentPath(__dirname, 3) + "/assets/icon.png",
       hasReply: true,
       replyPlaceholder: "Type your message here",
       // silent: false,
       // timeoutType: "default",
       // urgency: "normal",
+      // toastXml: toastXml,
     });
     myNotification.on("reply", (_, message) => {
       if(!message.trim()) return;
@@ -79,10 +97,14 @@ function handleNotification(screen) {
     // actions
 
     myNotification.on("click", () => {
+      log.info('click event')
       screen.webContents.send("OPEN_URL", url);
       screen.show();
       screen.focus();
       myNotification.close();
+      notifications = notifications.filter((item) => {
+        return new URL(item.url)?.pathname !== currentPathName;
+      });
       showNotification();
     });
     myNotification.on("close", () => {

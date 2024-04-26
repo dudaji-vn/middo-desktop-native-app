@@ -28,39 +28,54 @@ if (!gotTheLock) {
   app.quit();
 } else {
   let mainWindow;
-  let currentURL = null;
   function openUrl(urlStr) {
-    log.info("open-url", urlStr);
-    if (!urlStr) return;
-    const urlParse = url.parse(urlStr, true);
-    const {query, pathname, host} = urlParse;
-    if(mainWindow) {
-      mainWindow.show();
-      mainWindow.focus();
-    }
-    if(pathname && pathname !== "/") {
-      if (!mainWindow) {
-        app.on("ready", () => {
-          openUrl(urlStr);
-        });
-        return;
+    try {
+      if (!urlStr) return;
+      log.info("open-url", urlStr);
+      const urlParse = url.parse(urlStr, true);
+      let dataEncode = urlParse.query?.data;
+      if(!dataEncode) return;
+      // remove %7 from end of dataEncode if have by } character
+      if(dataEncode.endsWith("%7")) {
+        dataEncode = dataEncode.slice(0, -2);
+        dataEncode += "}";
       }
-      log.info("open inside url", host + pathname);
-      mainWindow.webContents.send("OPEN_URL", host + pathname);
-      mainWindow.show();
-      mainWindow.focus();
-      return;
+      const dataString = decodeURIComponent(dataEncode);
+      if(!dataString) return;
+      const data = JSON.parse(dataString);
+      if(!data || !data?.type || !data.data) return;
+      if(mainWindow) {
+        mainWindow.setAlwaysOnTop(true);
+        mainWindow.show();
+        mainWindow.setAlwaysOnTop(false);
+        app.focus();
+      }
+      switch(data.type) {
+        case "google-login":
+          const { token, refresh_token } = data.data;
+          if(!token || !refresh_token) return;
+          log.info("login google", { token, refresh_token });
+          mainWindow.webContents.send(EVENTS.GOOGLE_LOGIN_SUCCESS, {
+            token,
+            refresh_token,
+          });
+          break;
+        case 'redirect': // This for click custom link in notification
+          const { url } = data.data;
+          if(!url) return;
+          log.info("open inside url", url);
+          mainWindow.webContents.send("OPEN_URL", url);
+          break;
+        default:
+          break;
+      }
+    } catch (error) {
+      log.error(error);
     }
-    const { token, refresh_token } = query;
-    log.info("login google", { token, refresh_token });
-    mainWindow.webContents.send(EVENTS.GOOGLE_LOGIN_SUCCESS, {
-      token,
-      refresh_token,
-    });
   }
   
   function appReady() {
-    mainWindow = createMainScreen(APP_URL)
+    mainWindow = createMainScreen(APP_URL + '/talk');
     createTray(mainWindow);
     setupPushReceiver(mainWindow.webContents);
     setupShortcut(mainWindow);
