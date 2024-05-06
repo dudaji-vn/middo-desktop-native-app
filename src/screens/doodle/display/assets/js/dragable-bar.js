@@ -1,5 +1,6 @@
-dragElement(document.querySelector(".dragable"));
+dragElement(document.querySelector(".dragable-header"));
 function dragElement(elmnt) {
+  let dragContainer = elmnt.parentElement;
   var pos1 = 0,
     pos2 = 0,
     pos3 = 0,
@@ -31,9 +32,24 @@ function dragElement(elmnt) {
     pos2 = pos4 - e.clientY;
     pos3 = e.clientX;
     pos4 = e.clientY;
-    // set the element's new position:
-    elmnt.style.top = elmnt.offsetTop - pos2 + "px";
-    elmnt.style.left = elmnt.offsetLeft - pos1 + "px";
+    let top = dragContainer.offsetTop - pos2;
+    let left = dragContainer.offsetLeft - pos1;
+    let maxTop = window.innerHeight - dragContainer.clientHeight;
+    let maxLeft = window.innerWidth - dragContainer.clientWidth / 2;
+    if (top < 0) {
+      top = 0;
+    }
+    if (left < dragContainer.clientWidth / 2) {
+      left = dragContainer.clientWidth / 2;
+    }
+    if (top > maxTop) {
+      top = maxTop;
+    }
+    if (left > maxLeft) {
+      left = maxLeft;
+    }
+    dragContainer.style.top = top + "px";
+    dragContainer.style.left = left + "px";
   }
 
   function closeDragElement() {

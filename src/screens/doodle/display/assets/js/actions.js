@@ -3,8 +3,15 @@ let btnToggleDraw = document.querySelector(".toggle-draw");
 let btnToggleMic = document.querySelector(".toggle-mic");
 let btnToggleCamera = document.querySelector(".toggle-camera");
 let btnStopShare = document.querySelector(".stop-share");
+let btnToggleMinimize = document.querySelector(".toggle-minimize");
+let dragableContent = document.querySelector(".dragable-content");
 let isWaitingForLoadMedia = false;
 let canvas = document.querySelector("#draw");
+
+btnToggleMinimize.addEventListener("click", () => {
+  dragableContent.classList.toggle('minimize')
+});
+
 btnToggleDraw.addEventListener("click", () => {
   const isActive = btnToggleDraw.classList.contains("active");
   if (isActive) {

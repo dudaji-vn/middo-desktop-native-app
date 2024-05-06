@@ -30,33 +30,91 @@ body::after {
   height: 100%;
   object-fit: cover;
 }
-
 .dragable {
   position: absolute;
   z-index: 9;
   text-align: center;
-  bottom: 20px;
+  top: 70%;
   left: 50%;
   transform: translateX(-50%);
+  padding: 2px;
+  background-color: #D0DEF1;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.dragable-header {
+  padding: 4px;
+  cursor: grab;
+  margin: -2px;
+  margin-bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.dragable-header:active {
+  cursor: grabbing;
+  background-color: #A4C2EA;
+}
+
+.dragable-content {
+  text-align: center;
   height: fit-content;
-  padding: 16px;
-  border-radius: 10px;
-  border: 1px solid #3d87ed88;
+  padding: 12px;
   background-color: #fff;
+  display: flex;
+  border-radius: 0 0 10px 10px;
+  justify-content: center;
+  align-items: center;
+}
+
+.dragable-logo {
+  margin-right: 36px;
+}
+.dragable-logo img {
+  height: 36px;
+  user-select: none;
+  pointer-events: none;
+}
+.dragable-actions {
   display: flex;
   gap: 12px;
   justify-content: center;
   align-items: center;
-  cursor: grab;
+  transition: all 0.2s linear;
+  width: fit-content
 }
-.dragable:active {
-  cursor: grabbing;
+.dragable-minimize {
+  color: #fff;
+  width: 28px;
+  height: 28px;
+  border-radius: 100%;
+  border: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-size: 20px;
+  margin-left: 8px;
+  transition: all 0.2s linear;
+}
+.dragable-minimize:hover {
+  background-color: #e8e8e8;
+}
+.dragable-content.minimize .dragable-actions{
+  width: 0;
+  overflow: hidden;
+}
+.dragable-content.minimize .dragable-minimize{
+  transform: rotate(180deg);
+}
+.dragable-content.minimize .dragable-logo {
+  margin-right: 4px;
 }
 .btn {
-  padding: 10px;
+  /* padding: 0px; */
   color: #fff;
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   background-color: #e8e8e8;
   border-radius: 100%;
   border: none;
@@ -64,6 +122,11 @@ body::after {
   justify-content: center;
   align-items: center;
   cursor: pointer;
+  font-size: 20px;
+}
+.btn img {
+  width: 20px;
+  height: 20px;
 }
 .btn.active {
   background-color: #3d87ed;
