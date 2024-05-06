@@ -10,21 +10,34 @@
     <div class="image-list"></div>
     <div id="draw" class="draw"></div>
     <div class="dragable interactive">
-      <button class="btn toggle-draw">
-        <img class="on" src="./assets/images/draw-on.svg" alt="" />
-        <img class="off" src="./assets/images/draw-off.svg" alt="" />
-      </button>
-      <button class="btn active toggle-mic">
-        <img class="on" src="./assets/images/mic-on.svg" alt="" />
-        <img class="off" src="./assets/images/mic-off.svg" alt="" />
-      </button>
-      <button class="btn toggle-camera">
-        <img class="on" src="./assets/images/camera-on.svg" alt="" />
-        <img class="off" src="./assets/images/camera-off.svg" alt="" />
-      </button>
-      <button class="btn active stop-share">
-        <img class="on" src="./assets/images/share-screen.svg" alt="" />
-      </button>
+      <div class="dragable-header">
+        <img class="on" src="./assets/images/drag.svg" alt="Drag" />
+      </div>
+      <div class="dragable-content">
+        <div class="dragable-logo">
+          <img src="./assets/images/logo.png" alt="Middo Logo" />
+        </div>
+        <div class="dragable-actions">
+          <button class="btn toggle-draw">
+            <img class="on" src="./assets/images/draw-on.svg" alt="Draw On" />
+            <img class="off" src="./assets/images/draw-off.svg" alt="Draw Off" />
+          </button>
+          <button class="btn active toggle-mic">
+            <img class="on" src="./assets/images/mic-on.svg" alt="Mic On" />
+            <img class="off" src="./assets/images/mic-off.svg" alt="Mic Off" />
+          </button>
+          <button class="btn toggle-camera">
+            <img class="on" src="./assets/images/camera-on.svg" alt="Camera On" />
+            <img class="off" src="./assets/images/camera-off.svg" alt="Camera Off" />
+          </button>
+          <button class="btn active stop-share">
+            <img class="on" src="./assets/images/share-screen.svg" alt="Stop Share screen" />
+          </button>
+        </div>
+        <div class="dragable-minimize toggle-minimize">
+          <img src="./assets/images/arrow-left.svg" alt="Minimize" />
+        </div>
+      </div>
     </div>
 
     <script src="./assets/vendor/konva.min.js"></script>
@@ -35,3 +48,4 @@
     <script src="./assets/js/drawing.js"></script>
   </body>
 </html>
+
