@@ -62,11 +62,13 @@ function handleNotification(screen) {
       data: { url },
     }
     const dataUrl = encodeURIComponent(JSON.stringify(dataObj));
+    const logoPath = getParentPath(__dirname, 7) + "\\app.ico";
+    // const logoPath = path.join(__dirname, "..", "..", "..", "assets", "icon.png");
     const toastXml = ` 
     <toast launch="middo://?data=${dataUrl}" activationType="protocol">
     <visual>
         <binding template="ToastGeneric">
-            <image placement='appLogoOverride' src='${ getParentPath(__dirname, 3) + "/assets/icon.png"}'/>
+            <image placement='appLogoOverride' src='${logoPath}'/>
             <text>${title}</text>
             <text placement="attribution">${body}</text>
         </binding>
@@ -82,7 +84,7 @@ function handleNotification(screen) {
       // silent: false,
       // timeoutType: "default",
       // urgency: "normal",
-      // toastXml: toastXml,
+      toastXml: toastXml,
     });
     myNotification.on("reply", (_, message) => {
       if(!message.trim()) return;
