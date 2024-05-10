@@ -16,7 +16,9 @@ const globalEvents = require("./global-events");
 const { APP_URL, IS_MAC, APP_MODEL_ID } = require("./config");
 const { EVENTS } = require("./events");
 
-app.setAppUserModelId(APP_MODEL_ID);
+if(!IS_MAC) {
+  app.setAppUserModelId(APP_MODEL_ID);
+} 
 setupLogSystem();
 setupAutoUpdate();
 setupStartUpApp();
@@ -113,12 +115,12 @@ if (!gotTheLock) {
     openUrl(commandLine.pop().slice(0, -1));
   });
   app.on("open-url", (event, url) => {
-    log.info("open-url", url);
+    // log.info("open-url", url);
     openUrl(url);
   });
 }
 
 process.on("uncaughtException", (error) => {
-  log.error(error);
+  log.error('APP_ERROR', error);
   app.quit();
 });

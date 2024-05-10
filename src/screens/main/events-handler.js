@@ -79,7 +79,7 @@ function handleEvent(screen) {
         doodleScreen = null;
       }
     } else if (internetStatus === "online") {
-      screen.loadURL(currentURL || APP_URL);
+      screen.loadURL(currentURL || APP_URL + "/talk");
     }
   }
 
