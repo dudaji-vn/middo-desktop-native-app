@@ -1,7 +1,6 @@
 const { setup: setupPushReceiver } = require("electron-push-receiver");
-const { app, BrowserWindow, net, ipcMain } = require("electron");
+const { app, BrowserWindow, autoUpdater } = require("electron");
 const log = require("electron-log");
-const path = require("path");
 const url = require("url");
 
 const setupAutoUpdate = require("./setups/auto-update");
@@ -103,10 +102,12 @@ if (!gotTheLock) {
     if (!IS_MAC) app.quit();
   });
   app.on("before-quit", () => {
+    log.info("before-quit");
     const windows = BrowserWindow.getAllWindows();
     windows.forEach((window) => window.destroy());
   });
   app.on("second-instance", (_, commandLine, __) => {
+    log.info("second-instance", commandLine);
     if (mainWindow) {
       if (mainWindow.isMinimized()) mainWindow.restore();
       mainWindow.show();
@@ -119,7 +120,12 @@ if (!gotTheLock) {
     openUrl(url);
   });
 }
-
+// before-quit-for-update
+autoUpdater.on("before-quit-for-update", () => {
+  const windows = BrowserWindow.getAllWindows();
+  windows.forEach((window) => window.destroy());
+  mainWindow = null;
+});
 process.on("uncaughtException", (error) => {
   log.error('APP_ERROR', error);
   app.quit();
