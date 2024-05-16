@@ -6,19 +6,18 @@ function setupAutoUpdate() {
   updateElectronApp({
     logger: {
       info: (msg) => {
-        log.info(msg);
+        log.info("Auto update INFO::", msg);
       },
       error: (msg) => {
-        log.error(msg);
+        log.error("Auto update ERROR::", msg);
       },
       warn: (msg) => {
-        log.warn(msg);
+        log.warn("Auto update WARN::", msg);
       },
       log: (msg) => {
-        log.log(msg);
+        log.info("Auto update LOG::", msg);
       },
     },
-    notifyUser: !IS_MAC,
   });
 }
 module.exports = setupAutoUpdate;
