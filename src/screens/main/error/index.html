@@ -46,6 +46,31 @@
         margin-top: 16px;
         text-align: center;
       }
+      button {
+        padding-left: 1rem;
+        padding-right: 1rem;
+        padding-top: 0.75rem;
+        padding-bottom: 0.75rem;
+        font-weight: 500;
+        color: #fff;
+        background-color: #3d88ed;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 1rem;
+        border-radius: 0.75rem;
+        outline: none;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s linear;
+        font-size: 16px;
+
+      }
+      button:hover {
+        opacity: 0.9;
+      }
+      button:active {
+        opacity: 0.8;
+      }
     </style>
   </head>
   <body>
@@ -56,6 +81,15 @@
         Please connect to a Wi-Fi or mobile network, check your internet
         connection or restart your device if need
       </p>
+      <button id="refresh">Refresh</button>
     </main>
+    <script>
+      // add window loaded event
+      window.addEventListener("load", () => {
+        document.getElementById("refresh").addEventListener("click", () => {
+          ipcRenderer.send("REFRESH");
+        });
+      });
+    </script>
   </body>
 </html>
