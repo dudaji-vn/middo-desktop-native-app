@@ -92,6 +92,10 @@ function handleEvent(screen) {
       changePage(status);
     }
   });
+
+  ipcMain.on(EVENTS.REFRESH, () => {
+    screen.reload();
+  });
   
 }
 
