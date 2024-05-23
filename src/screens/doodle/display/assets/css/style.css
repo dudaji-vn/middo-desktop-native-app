@@ -35,7 +35,7 @@ body::after {
   z-index: 9;
   text-align: center;
   top: 70%;
-  left: 50%;
+  left: 10%;
   transform: translateX(-50%);
   padding: 2px;
   background-color: #D0DEF1;

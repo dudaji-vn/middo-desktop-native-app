@@ -2,6 +2,7 @@ const { BrowserWindow, ipcMain } = require("electron");
 const path = require('path')
 
 const { EVENTS } = require("../../events");
+const { IS_MAC } = require("../../config");
 
 class CallComingScreen {
   constructor(args) {
@@ -12,7 +13,7 @@ class CallComingScreen {
       roundedCorners: false,
       hasShadow: true,
       width: 320,
-      height: 200,
+      height: IS_MAC ? 200 : 220,
       webPreferences: {
         hardwareAcceleration: true,
         contextIsolation: true,
@@ -22,6 +23,12 @@ class CallComingScreen {
     });
     this.screen.loadFile(path.join(__dirname, "display", "index.html"))
     this.screen.show()
+    // Hide scrollbars
+    this.screen.webContents.on('did-finish-load', () => {
+      this.screen.webContents.insertCSS('::-webkit-scrollbar { display: none; }');
+    });
+    // Hide menu
+    this.screen.setMenu(null);
     let level = 'normal';
     if (process.platform === 'darwin')level = 'floating';
     this.screen.setAlwaysOnTop(true, level);
