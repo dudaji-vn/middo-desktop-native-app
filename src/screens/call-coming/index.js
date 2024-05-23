@@ -1,0 +1,41 @@
+const { BrowserWindow, ipcMain } = require("electron");
+const path = require('path')
+
+const { EVENTS } = require("../../events");
+
+class CallComingScreen {
+  constructor(args) {
+    this.screen = new BrowserWindow({
+      alwaysOnTop: true,
+      modal: true,
+      show: false,
+      roundedCorners: false,
+      hasShadow: true,
+      width: 320,
+      height: 200,
+      webPreferences: {
+        hardwareAcceleration: true,
+        contextIsolation: true,
+        nodeIntegration: true,
+        preload: path.join(__dirname, "preload.js"),
+      }
+    });
+    this.screen.loadFile(path.join(__dirname, "display", "index.html"))
+    this.screen.show()
+    let level = 'normal';
+    if (process.platform === 'darwin')level = 'floating';
+    this.screen.setAlwaysOnTop(true, level);
+    this.screen.webContents.on('did-finish-load', () => {
+      this.screen.webContents.send(EVENTS.INCOMING_CALL_DATA, args);
+    });
+  }
+
+  destroy() {
+    this.screen.hide();
+    this.screen.close();
+    this.screen.destroy();
+    this.screen = null;
+  }
+}
+
+module.exports = CallComingScreen
