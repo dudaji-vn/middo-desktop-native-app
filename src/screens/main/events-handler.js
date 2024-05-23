@@ -109,12 +109,14 @@ function handleEvent(screen) {
 
   // Event receive call from main
   ipcMain.on(EVENTS.RECEIVE_CALL_INVITE, (_, args) => {
+    
     callComingScreen = new CallComingScreen(args);
 
     callComingScreen.screen.on('close', () => {
       screen.webContents.send(EVENTS.CALL_RESPONSE, 'DECLINE');
       ipcMain.removeAllListeners(EVENTS.NO_CALL);
       ipcMain.removeAllListeners(EVENTS.CALL_RESPONSE);
+      callComingScreen = null;
     });
 
     ipcMain.on(EVENTS.NO_CALL, (_) => {
