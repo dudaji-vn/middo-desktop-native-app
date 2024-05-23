@@ -1,0 +1,78 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  font-family: "Open Sans", sans-serif;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.container {
+  width: 100%;
+  padding: 12px;
+}
+.call-header {
+  padding: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 12px;
+}
+.call-header img {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.call-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+.btn {
+  padding: 8px 12px;
+  background-color: #3d87ed;
+  border-radius: 8px;
+  outline: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s linear;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  fill: #fff;
+  stroke: #fff;
+}
+.btn svg {
+  width: 16px;
+  height: 16px;
+}
+.btn:active {
+  transform: scale(0.95);
+}
+.btn:hover {
+  opacity: 0.8;
+}
+.btn-decline {
+  flex: 1;
+  background-color: #ff3333;
+  color: #fff;
+}
+.btn-accept {
+  flex: 1;
+  background-color: #50c778;
+  color: #fff;
+}

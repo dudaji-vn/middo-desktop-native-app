@@ -36,6 +36,7 @@ contextBridge.exposeInMainWorld("ipcRenderer", {
   },
   off: (channel, func) => {
     ipcRenderer.removeListener(channel, func);
+    ipcRenderer.removeAllListeners(channel);
   },
 });
 

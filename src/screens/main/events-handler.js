@@ -9,10 +9,12 @@ const path = require('path')
 const { APP_URL } = require("../../config");
 const { EVENTS } = require("../../events");
 const ScreenDoodle = require("../doodle");
+const CallComingScreen = require("../call-coming");
 
 function handleEvent(screen) {
   
   let doodleScreen = null;
+  let callComingScreen = null;
   let currentURL = null;
   let isOnline = net.isOnline();
   
@@ -63,6 +65,10 @@ function handleEvent(screen) {
       doodleScreen.destroyAll();
       doodleScreen = null;
     }
+    if (callComingScreen) {
+      callComingScreen.destroy();
+      callComingScreen = null;
+    }
   });
 
   // Event doodle
@@ -77,6 +83,10 @@ function handleEvent(screen) {
       if(doodleScreen) {
         doodleScreen.destroyAll();
         doodleScreen = null;
+      }
+      if(callComingScreen) {
+        callComingScreen.destroy();
+        callComingScreen = null;
       }
     } else if (internetStatus === "online") {
       screen.loadURL(currentURL || APP_URL + "/talk");
@@ -96,6 +106,58 @@ function handleEvent(screen) {
   ipcMain.on(EVENTS.REFRESH, () => {
     screen.reload();
   });
+
+  // Event receive call from main
+  ipcMain.on(EVENTS.RECEIVE_CALL_INVITE, (_, args) => {
+    
+    callComingScreen = new CallComingScreen(args);
+
+    callComingScreen.screen.on('close', () => {
+      screen.webContents.send(EVENTS.CALL_RESPONSE, 'DECLINE');
+      ipcMain.removeAllListeners(EVENTS.NO_CALL);
+      ipcMain.removeAllListeners(EVENTS.CALL_RESPONSE);
+      callComingScreen = null;
+    });
+
+    ipcMain.on(EVENTS.NO_CALL, (_) => {
+      if(callComingScreen) {
+        callComingScreen.destroy();
+        callComingScreen = null;
+      }
+      ipcMain.removeAllListeners(EVENTS.NO_CALL);
+      ipcMain.removeAllListeners(EVENTS.CALL_RESPONSE);
+    });
+    ipcMain.on(EVENTS.CALL_RESPONSE, (_, response) => {
+      screen.webContents.send(EVENTS.CALL_RESPONSE, response);
+      
+      if(callComingScreen) {
+        callComingScreen.destroy();
+        callComingScreen = null;
+      }
+      if(response == 'ACCEPT') {
+        // Focus to main screen
+        if(screen.isMinimized()) {
+          screen.restore();
+        }
+        screen.setAlwaysOnTop(true);
+        screen.focus();
+        screen.show();
+        screen.setAlwaysOnTop(false);
+      }
+      
+      // Send response to main
+      
+
+      // Remove event listener
+      ipcMain.removeAllListeners(EVENTS.NO_CALL);
+      ipcMain.removeAllListeners(EVENTS.CALL_RESPONSE);
+
+    });
+  });
+
+  
+  
+  
   
 }
 

@@ -8,6 +8,9 @@ function setupShortcut(mainWindow) {
     globalShortcut.register('CommandOrControl+R', function () {
       mainWindow.reload()
     })
+    globalShortcut.register('CommandOrControl+Shift+I', function () {
+      mainWindow.webContents.toggleDevTools()
+    })
   });
   mainWindow.on('blur', () => {
     globalShortcut.unregisterAll(mainWindow);
