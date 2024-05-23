@@ -23,6 +23,8 @@ class CallComingScreen {
     });
     this.screen.loadFile(path.join(__dirname, "display", "index.html"))
     this.screen.show()
+    this.screen.setResizable(false);
+    this.screen.setMaximizable(false);
     // Hide scrollbars
     this.screen.webContents.on('did-finish-load', () => {
       this.screen.webContents.insertCSS('::-webkit-scrollbar { display: none; }');

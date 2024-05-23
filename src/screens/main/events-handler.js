@@ -126,6 +126,8 @@ function handleEvent(screen) {
       ipcMain.removeAllListeners(EVENTS.CALL_RESPONSE);
     });
     ipcMain.on(EVENTS.CALL_RESPONSE, (_, response) => {
+      screen.webContents.send(EVENTS.CALL_RESPONSE, response);
+      
       if(callComingScreen) {
         callComingScreen.destroy();
         callComingScreen = null;
@@ -142,7 +144,7 @@ function handleEvent(screen) {
       }
       
       // Send response to main
-      screen.webContents.send(EVENTS.CALL_RESPONSE, response);
+      
 
       // Remove event listener
       ipcMain.removeAllListeners(EVENTS.NO_CALL);
